@@ -9,12 +9,14 @@
 
 #include "defs.h"
 #include "read.h"
+#include "naivenn.h"
+#include "makeSparse.h"
 
 #include <iostream>
 #include <stdexcept>
 #include <ctime>
 
-int main(int argc, char** argv) {
+int main(){
 	std::clock_t timer;
 	timer = std::clock();
 	Image M;

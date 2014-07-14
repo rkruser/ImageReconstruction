@@ -2,7 +2,7 @@
 #define DEFS_H
 #include <cstdlib>
 #include <vector>
-using std::size_t; //The only reason for including the library
+using std::size_t; //The only reason for including cstdlib
 
 typedef std::vector<std::vector<std::vector<double>>> Image;
 typedef std::vector<std::vector<double>> Row;
