@@ -4,8 +4,9 @@
  * einstein
  * stopSign2 (stopSign_)
 */
-#define IMAGE einstein
-#include "einstein.xpm"
+#define IMAGE beach
+#include "beach.xpm"
+#define BLACK_AND_WHITE true
 
 #include "defs.h"
 #include "read.h"
@@ -21,7 +22,10 @@ int main(){
 	timer = std::clock();
 	Image M;
 	try {
-	M = imProcess(IMAGE);
+		M = imProcess(IMAGE);
+		if (BLACK_AND_WHITE) {
+			M = makeGrayScale(M);
+		}
 	}
 	catch (too_many_chars_per_pixel e) {
 		std::cerr << "Too many chars per pixel\n";
@@ -39,8 +43,14 @@ int main(){
 	//std::cout << "Time elapsed = " << double(timer)/CLOCKS_PER_SEC << '\n';
 	
 	// Problem: for some reason, the online xpm file converter only retains 256 colors,
-	// diminishing image quality
-	printImage(M);
+	// diminishing image quality for color images
+	Image sparseImage(M);
+	makeSparse(sparseImage, 0.2);
+	printImage(sparseImage);
+	if (BLACK_AND_WHITE) {
+		printImage(sparseImage);
+		printImage(sparseImage);
+	}
 
 	return 0;
 }

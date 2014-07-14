@@ -7,18 +7,28 @@
 #include <unordered_map>
 #include <iomanip>
 #include <algorithm>
+#include <cmath>
 
-#define charBuffer 10
+#define CHARBUFFER 10
 
 RGB extractPixels(int n) {
-	int Rmask = 0x00FF0000;
-	int Gmask = 0x0000FF00;
-	int Bmask = 0x000000FF;
 	RGB p;
-	p.r = (n&Rmask)>>16;
-	p.g = (n&Gmask)>>8;
-	p.b = n&Bmask;
+	p.r = (n >> 16) & 0xff;
+	p.g = (n >> 8) & 0xff;
+	p.b = n&0xff;
 	return p;
+}
+
+Image makeGrayScale(const Image& M) {
+	if (M.frames <= 1) return M;
+	Image newIm(M.rows,M.cols,1);
+	for (size_t i = 0; i < M.rows; ++i) {
+		for (size_t j = 0; j < M.cols; ++j) {
+			newIm(i,j,0) = std::round(0.2989*M(i,j,0)+0.5870*M(i,j,1)+0.1140*M(i,j,2));
+			//The numbers come from the literature on apparent brightness of various colors
+		}
+	}
+	return newIm;
 }
 
 Image imProcess(const char** m) {
@@ -30,12 +40,12 @@ Image imProcess(const char** m) {
  
 	// Read and Process the first line
 	size_t pos = 0;
-	std::stringstream str(m[pos]); //Guaranteed to exist
+	std::stringstream str(m[pos]);
 	++pos;
 	int columns, rows, colors, charsPerPixel;
 	str >> columns >> rows >> colors >> charsPerPixel;
 
-	if (charsPerPixel >= charBuffer) {
+	if (charsPerPixel >= CHARBUFFER) {
 		too_many_chars_per_pixel error;
 		throw error;
 	}
@@ -45,7 +55,7 @@ Image imProcess(const char** m) {
 	size_t limit = pos+colors;
 	for ( ; pos < limit; ++pos) {
 		std::stringstream str(m[pos]);
-		char s[charBuffer]; //The number of chars won't exceed 4, most likely
+		char s[CHARBUFFER];
 		str.get(s, charsPerPixel+1);
 		char option;
 		str >> option; //Read color option
@@ -61,11 +71,12 @@ Image imProcess(const char** m) {
 		colorTable.insert(std::make_pair(std::string(s),pixelValue));
 	}
 
+	//Form the image
 	Image M(rows, columns, 3);
 	for (int i = 0; i < rows; ++i) {
 		std::stringstream str(m[pos+i]);
 		for (int j = 0; j < columns; ++j) {
-			char s[charBuffer];
+			char s[CHARBUFFER];
 			str.get(s,charsPerPixel+1);
 			RGB& pixel = colorTable.at(std::string(s));
 			M(i,j,0) = pixel.r;
@@ -79,7 +90,12 @@ Image imProcess(const char** m) {
 
 void printImage(const Image& M) {
 	for (size_t l = 0; l < M.size; ++l) {
-		std::cout << M(l) << '\n';
+		if (std::isnan(M(l))) {
+			std::cout << 255 << '\n';
+		}
+		else {
+			std::cout << M(l) << '\n';
+		}
 	}
 }
 

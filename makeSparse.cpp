@@ -2,12 +2,10 @@
 #include "defs.h"
 
 #include <cstdlib>
-#include <cmath>
 #include <vector>
 
 class PoutOfRange{};
 
-// Requires that M actually contain pixels, so size can be read
 void makeSparse(Image& M, double P) {
 	if (P < 0 or P > 1) {
 		PoutOfRange e;
@@ -23,7 +21,7 @@ void makeSparse(Image& M, double P) {
 
 	std::vector<bool> toChange(M.size, false);
 	for (int i = 1; i <= numRemoved; ++i) {
-		int index = std::rand()%M.size; //Which pixel
+		int index = std::rand()%M.size;
 		while (toChange[index]) {
 			index = std::rand()%M.size;
 		}
