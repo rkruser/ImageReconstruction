@@ -2,10 +2,10 @@
  * beach
  * boats
  * einstein
- * stopSign2
+ * stopSign2 (stopSign_)
 */
-#define IMAGE beach
-#include "beach.xpm"
+#define IMAGE einstein
+#include "einstein.xpm"
 #define charBuffer 10
 
 #include "defs.h"
@@ -19,19 +19,14 @@
 #include <ctime>
 #include <iomanip>
 #include <algorithm>
-typedef std::vector<std::vector<std::vector<double>>> Image;
-typedef std::vector<std::vector<double>> Row;
-typedef std::vector<double> Column;
-
 
 // Question: should I use double** and put r,g,b values next to each other?
-Image imProcess(const char**);
+
 RGB extractPixels(int);
-void printImage(const Image&, Range, Range, Range);
+void printImage(const Image&);
+Image imProcess(const char**);
 
 int main(int argc, char** argv) {
-	std::cout << "Hello World.\n";
-
 	std::clock_t timer;
 	timer = std::clock();
 	Image M;
@@ -51,8 +46,14 @@ int main(int argc, char** argv) {
 		exit(1);
 	}
 	timer = std::clock() - timer;
-	std::cout << "Time elapsed = " << double(timer)/CLOCKS_PER_SEC << '\n';
-	printImage(M, Range(0,20,1), Range(0,20,1), Range(0,1,1));
+	//std::cout << "Time elapsed = " << double(timer)/CLOCKS_PER_SEC << '\n';
+	
+	//std::cout << M.size() << ' ' << M[0].size() << ' ' << M[0][0].size() << '\n';
+	//Seems to be working
+	//Load with fopen, fscanf
+	//Load the printout in matlab, then do uint8(reshape(M', col, row)');
+	//This will produce the correct read-in
+	printImage(M);
 
 	return 0;
 }
@@ -124,12 +125,11 @@ Image imProcess(const char** m) {
 	return M;
 }
 
-void printImage(const Image& M, Range rows, Range columns, Range frames) {
-	for (size_t k = frames.start(); k < std::min(frames.end(),M.size()); k += frames.inc()) {
-		for (size_t i = rows.start(); i < std::min(rows.end(),M[k].size()); i += rows.inc()) {
-			for (size_t j = columns.start(); j < std::min(columns.end(),M[k][i].size());
-					j += columns.inc()) {
-				std::cout << std::setw(4) << M[k][i][j];
+void printImage(const Image& M) {
+	for (size_t i = 0; i < M.size(); ++i) {
+		for (size_t j = 0; j < M[i].size(); ++j) {
+			for (size_t k = 0; k < M[i][j].size(); ++k) {
+				std::cout << std::setw(4) << M[i][j][k];
 			}
 			std::cout << '\n';
 		}

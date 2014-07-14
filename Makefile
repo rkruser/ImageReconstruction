@@ -14,16 +14,6 @@ inc = -Iimages
 debug: main.exe 
 optimize: clean main.exe
 
-# Test targets
-main2: main2.cpp
-	g++ -o main2.tst main2.cpp
-test1: test1.cpp
-	g++ -o test1.tst test1.cpp
-test2: test2.cpp
-	g++ -o test2.tst test2.cpp
-test3: test3.cpp
-	g++ -o test3.tst test3.cpp
-
 #Dependencies of main targets
 main.exe: $(obj)
 	g++ -o main.exe $(inc) $(args) $(obj)
@@ -35,7 +25,3 @@ main.o: main.cpp defs.h
 clean:
 	rm -rf *.o *.exe
 
-# Clean results of test targets
-.PHONY: clean2
-clean2:
-	rm -rf *.tst
