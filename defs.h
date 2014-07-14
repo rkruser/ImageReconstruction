@@ -2,7 +2,10 @@
 #define DEFS_H
 #include <cstdlib>
 #include <vector>
+#include <limits>
 using std::size_t; //The only reason for including cstdlib
+
+#define NAN std::numeric_limits<double>::quiet_NaN();
 
 typedef std::vector<std::vector<std::vector<double>>> Image;
 typedef std::vector<std::vector<double>> Row;
