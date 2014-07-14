@@ -1,7 +1,6 @@
 #ifndef DEFS_H
 #define DEFS_H
 #include <cstdlib>
-#include <vector>
 #include <limits>
 using std::size_t; //The only reason for including cstdlib
 

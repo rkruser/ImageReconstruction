@@ -3,6 +3,7 @@
 
 #include <cstdlib>
 #include <cmath>
+#include <vector>
 
 class PoutOfRange{};
 
@@ -12,22 +13,30 @@ void makeSparse(Image& M, double P) {
 		PoutOfRange e;
 		throw e;
 	}
-	bool flip = false;
+	int numRemoved;
 	if (P > 0.5) {
-		flip = true;
-		P = 1-P;
+		numRemoved = (1-P)*M.size;
+	}
+	else {
+		numRemoved = P*M.size;
 	}
 
-	int numRemoved = std::round(P*M.size);
-
+	std::vector<bool> toChange(M.size, false);
 	for (int i = 1; i <= numRemoved; ++i) {
 		int index = std::rand()%M.size; //Which pixel
-		while (std::isnan(M(index))) {
+		while (toChange[index]) {
 			index = std::rand()%M.size;
 		}
-		M(index) = NAN;
+		toChange[index] = true;
 	}
-	// Needs to handle flip case
 
+	if (P > 0.5) {
+		toChange.flip();
+	}
 
+	for (size_t i = 0; i < M.size; ++i) {
+		if (toChange[i]) {
+			M(i) = NAN;
+		}
+	}
 }
