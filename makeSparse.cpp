@@ -18,25 +18,14 @@ void makeSparse(Image& M, double P) {
 		P = 1-P;
 	}
 
-	int frames = M.size();
-	int rows = M[0].size();
-	int cols = M[0][0].size();
-	int numPixels = frames*rows*cols;
-	int framesize = rows*cols;
-	int numRemoved = std::round(P*numPixels);
+	int numRemoved = std::round(P*M.size);
 
 	for (int i = 1; i <= numRemoved; ++i) {
-		int index = std::rand()%numPixels; //Which pixel
-		int index1 = index/framesize; //Which frame
-		int index2 = (index % framesize) / cols; //Which row
-		int index3 = (index%framesize)%cols; //Which column
-		while (std::isnan(M[index1][index2][index3])) {
-			index = std::rand()%numPixels; 
-			index1 = index/framesize; 
-            index2 = (index % framesize) / cols;
-            index3 = (index%framesize)%cols; 
+		int index = std::rand()%M.size; //Which pixel
+		while (std::isnan(M(index))) {
+			index = std::rand()%M.size;
 		}
-		M[index1][index2][index3] = NAN;
+		M(index) = NAN;
 	}
 	// Needs to handle flip case
 

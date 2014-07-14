@@ -62,16 +62,16 @@ Image imProcess(const char** m) {
 		colorTable.insert(std::make_pair(std::string(s),pixelValue));
 	}
 
-	Image M(3, Row(rows, Column(columns,0))); //3 for r,g,b
+	Image M(rows, columns, 3);
 	for (int i = 0; i < rows; ++i) {
 		std::stringstream str(m[pos+i]);
 		for (int j = 0; j < columns; ++j) {
 			char s[charBuffer];
 			str.get(s,charsPerPixel+1);
 			RGB& pixel = colorTable.at(std::string(s));
-			M[0][i][j] = pixel.r;
-			M[1][i][j] = pixel.g;
-			M[2][i][j] = pixel.b;
+			M(i,j,0) = pixel.r;
+			M(i,j,1) = pixel.g;
+			M(i,j,2) = pixel.b;
 		}
 	}
 
@@ -79,10 +79,10 @@ Image imProcess(const char** m) {
 }
 
 void printImage(const Image& M) {
-	for (size_t i = 0; i < M.size(); ++i) {
-		for (size_t j = 0; j < M[i].size(); ++j) {
-			for (size_t k = 0; k < M[i][j].size(); ++k) {
-				std::cout << std::setw(4) << M[i][j][k];
+	for (size_t i = 0; i < M.frames; ++i) {
+		for (size_t j = 0; j < M.rows; ++j) {
+			for (size_t k = 0; k < M.cols; ++k) {
+				std::cout << std::setw(4) << M(j,k,i);
 			}
 			std::cout << '\n';
 		}
