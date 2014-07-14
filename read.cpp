@@ -78,14 +78,8 @@ Image imProcess(const char** m) {
 }
 
 void printImage(const Image& M) {
-	for (size_t i = 0; i < M.frames; ++i) {
-		for (size_t j = 0; j < M.rows; ++j) {
-			for (size_t k = 0; k < M.cols; ++k) {
-				std::cout << std::setw(4) << M(j,k,i);
-			}
-			std::cout << '\n';
-		}
-		std::cout << '\n';
+	for (size_t l = 0; l < M.size; ++l) {
+		std::cout << M(l) << '\n';
 	}
 }
 
