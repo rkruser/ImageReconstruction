@@ -15,7 +15,7 @@ debug: main.exe
 optimize: clean main.exe
 
 #Test targets
-test: test.cpp defs.h
+test: test.cpp naivenn.h
 	g++ -o test.test $(args) $(inc) test.cpp
 .PHONY: cleanTest
 cleanTest:
