@@ -2,7 +2,7 @@ PATH := /usr/um/gcc-4.7.0/bin:$(PATH)
 LD_LIBRARY_PATH := /usr/um/gcc-4.7.0/lib64
 LD_RUN_PATH := /usr/um/gcc-4.7.0/lib64
 #VPATH =  #Directories searched by make
-debug: args = -g -std=c++11 -Wall -Wextra -pedantic -Wvla 
+args = -g -std=c++11 -Wall -Wextra -pedantic -Wvla 
 optimize: args = -O3 -std=c++11
 # -funroll in optimize?
 obj = main.o read.o naivenn.o makeSparse.o
@@ -13,6 +13,13 @@ inc = -Iimages
 .PHONY: optimize
 debug: main.exe 
 optimize: clean main.exe
+
+#Test targets
+test: test.cpp defs.h
+	g++ -o test.test $(args) $(inc) test.cpp
+.PHONY: cleanTest
+cleanTest:
+	rm -rf *.test
 
 #Dependencies of main targets
 main.exe: $(obj)
