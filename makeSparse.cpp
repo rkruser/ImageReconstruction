@@ -6,6 +6,7 @@
 
 class PoutOfRange{};
 
+// Set 100*P percent of the pixels of M as nan
 void makeSparse(Image& M, double P) {
 	if (P < 0 or P > 1) {
 		PoutOfRange e;

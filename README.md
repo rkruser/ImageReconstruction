@@ -1,4 +1,3 @@
 ImageReconstruction
 ===================
-
-SURE Summer Research Project
+A SURE Summer Research Project

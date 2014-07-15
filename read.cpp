@@ -19,6 +19,7 @@ RGB extractPixels(int n) {
 	return p;
 }
 
+// Make a color image into a black and white image
 Image makeGrayScale(const Image& M) {
 	if (M.frames <= 1) return M;
 	Image newIm(M.rows,M.cols,1);
@@ -31,6 +32,7 @@ Image makeGrayScale(const Image& M) {
 	return newIm;
 }
 
+// Turn the included xpm file into an image object
 Image imProcess(const char** m) {
  // Read first line
  // Extract numbers
@@ -88,6 +90,7 @@ Image imProcess(const char** m) {
 	return M;
 }
 
+// Print the image to the desired ostream object
 void printImage(std::ostream& out, const Image& M) {
 	int numberOfTimes = 1;
 	if (M.frames == 1) numberOfTimes = 3;
