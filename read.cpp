@@ -88,16 +88,16 @@ Image imProcess(const char** m) {
 	return M;
 }
 
-void printImage(const Image& M) {
+void printImage(std::ostream& out, const Image& M) {
 	int numberOfTimes = 1;
 	if (M.frames == 1) numberOfTimes = 3;
 	for (int n = 1; n <= numberOfTimes; n++) {
 		for (size_t l = 0; l < M.size; ++l) {
 			if (std::isnan(M(l))) {
-				std::cout << 255 << '\n';
+				out << 255 << '\n';
 			}
 			else {
-				std::cout << M(l) << '\n';
+				out << M(l) << '\n';
 			}
 		}
 	}

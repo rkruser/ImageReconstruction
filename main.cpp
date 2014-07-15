@@ -14,6 +14,7 @@
 #include "makeSparse.h"
 
 #include <iostream>
+#include <fstream>
 #include <stdexcept>
 #include <ctime>
 
@@ -39,8 +40,6 @@ int main(){
 		std::cerr << "Pixel descriptor not in hash table\n";
 		exit(1);
 	}
-	timer = std::clock() - timer;
-	//std::cout << "Time elapsed = " << double(timer)/CLOCKS_PER_SEC << '\n';
 	
 	// Problem: for some reason, the online xpm file converter only retains 256 colors,
 	// diminishing image quality for color images
@@ -48,11 +47,20 @@ int main(){
 	makeSparse(sparseImage, 0.4);
 	Image naiveRepair(sparseImage);
 	naivenn(naiveRepair, 16);
-	printImage(M);
-	printImage(sparseImage);
-	printImage(naiveRepair);
+
+
+	std::ofstream f1, f2, f3;
+	f1.open("./textimages/original.txt");
+	f2.open("./textimages/sparse.txt");
+	f3.open("./textimages/naiveRecon.txt");
+	printImage(f1, M);
+	printImage(f2, sparseImage);
+	printImage(f3, naiveRepair);
+	f1.close();
+	f2.close();
+	f3.close();
 	timer = std::clock()-timer;
-	std::cerr << "Time elapsed:" << double(timer)/CLOCKS_PER_SEC << '\n';
+	std::cout << "Time elapsed: " << double(timer)/CLOCKS_PER_SEC << '\n';
 	
 
 	return 0;
