@@ -17,9 +17,13 @@ optimize: clean main.exe
 #Test targets
 test: test.cpp naivenn.h
 	g++ -o test.test $(args) $(inc) test.cpp
+test2:  test2.cpp defs.h
+	g++ -o test2.test $(args) $(inc) test2.cpp
+test3: test3.cpp defs.h sor.h
+	g++ -o test3.test $(args) $(inc) test3.cpp
 .PHONY: cleanTest
 cleanTest:
-	rm -rf *.test
+	rm -f *.test test*.o
 
 #Dependencies of main targets
 main.exe: $(obj)
@@ -36,5 +40,5 @@ makeSparse.o: defs.h makeSparse.h makeSparse.cpp
 # Clean results of main targets
 .PHONY: clean
 clean:
-	rm -rf *.o *.exe
+	rm -f *.o *.exe
 
