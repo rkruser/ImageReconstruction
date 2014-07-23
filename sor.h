@@ -2,6 +2,8 @@
 #define SOR_H
 
 #include "defs.h"
+#include <iostream>
+using std::cout;
 
 // x and y should have the same dimensions
 // Only same number of elements is enforced
@@ -45,18 +47,25 @@ void SOR(const Mat& A, const Mat& B, Mat& x, double w, double convergence) {
 
 	double difference = 2*convergence;
 
+	int iteration = 0; // Debugging
 	while (difference > convergence) {
+		iteration++;
+		cout << "Iteration " << iteration << '\n'; //Debugging
 		Mat xprev(x);
 		for (size_t i = 0; i < A.numRows(); i++) {
+			cout << "   i: " << i << '\n';
 			double sigma = 0;
 			for (size_t j = 0; j < B.numRows(); j++) {
+				cout << "      j: " << " A(i,j): " << A(i,j) << " X(j): " << x(j) << '\n';
 				if (j != i)  {
 					sigma += A(i,j)*x(j);
 				}
 			}
 			x(i) = x(i) + w*(((B(i) - sigma) / A(i,i)) - x(i));
+			cout << "   Sigma: " << sigma << " New x(i): " << x(i) << '\n';
 		}
 		difference = norm2(xprev, x);
+		cout << "Difference: " << difference << '\n';
 	}
 }
 

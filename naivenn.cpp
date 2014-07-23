@@ -4,6 +4,12 @@
 #include <cmath>
 #include <iostream> //For debugging
 
+/*******************************************************************************
+Note! This implementation works differently than the Matlab
+interpretation! The difference is the order in which surrounding pixels are 
+visited. 
+*******************************************************************************/
+
 //Iterates over every pixel in the image
 //If the pixel is a nan, then set it equal to the average of the nearest kPixels
 void naivenn(Image& M, int kPixels) {

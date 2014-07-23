@@ -44,9 +44,9 @@ int main(){
 	// Problem: for some reason, the online xpm file converter only retains 256 colors,
 	// diminishing image quality for color images
 	Image sparseImage(M);
-	makeSparse(sparseImage, 0.4);
+	makeSparse(sparseImage, 0.7);
 	Image naiveRepair(sparseImage);
-	naivenn(naiveRepair, 16);
+	naivenn(naiveRepair, 2);
 
 
 	std::ofstream f1, f2, f3;
