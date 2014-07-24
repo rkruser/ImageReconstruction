@@ -63,6 +63,10 @@ void SOR(const Mat& A, const Mat& B, Mat& x, double w, double convergence) {
 			}
 			x(i) = x(i) + w*(((B(i) - sigma) / A(i,i)) - x(i));
 			cout << "   Sigma: " << sigma << " New x(i): " << x(i) << '\n';
+			//Maybe use different convergence criterion?
+			//Maybe problem with Matrix class? (Unlikely)
+			//Maybe problem with the test case
+			//Maybe Markov was wrong?
 		}
 		difference = norm2(xprev, x);
 		cout << "Difference: " << difference << '\n';
