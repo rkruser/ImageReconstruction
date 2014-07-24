@@ -9,17 +9,16 @@ inc = -Iimages -Iinclude
 # Main targets
 .PHONY: debug
 .PHONY: optimize
-debug: main.exe 
+debug: main.exe
 optimize: clean main.exe
 
 #Test targets
-test1: test1.cpp naivenn.h
-	echo $@
+test1.test: test1.cpp naivenn.h
 	g++ -o test1.test $(args) $(inc) $< 
 # $< provides name of first argument in its proper directory
-test2:  test2.cpp defs.h
+test2.test:  test2.cpp defs.h
 	g++ -o test2.test $(args) $(inc) $<
-test3: test3.cpp defs.h sor.h
+test3.test: test3.cpp defs.h sor.h
 	g++ -o test3.test $(args) $(inc) $<
 .PHONY: cleanTest
 cleanTest:
