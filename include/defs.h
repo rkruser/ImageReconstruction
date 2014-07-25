@@ -138,6 +138,8 @@ Matrix<T> operator+ (const Matrix<T>& A, const Matrix<T>& B) {
 	return C;
 }
 
+// Possibly change this
+// Makes transposition difficult, maybe
 template <class T>
 void Matrix<T>::operator*= (const Matrix<T>& M) {
 	if (cols != M.rows) {
@@ -145,9 +147,6 @@ void Matrix<T>::operator*= (const Matrix<T>& M) {
 		throw s;
 	}
 	T* result = new T[rows*M.cols];
-	for (size_t a = 0; a < rows*M.cols; a++) {
-		result[a] = 0;
-	}
 	for (size_t i = 0; i < rows; i++) {
 		for (size_t j = 0; j < M.cols; j++) {
 			size_t index = i*M.cols+j;

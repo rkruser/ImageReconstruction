@@ -3,12 +3,13 @@
 
 #include "defs.h"
 #include <iostream>
+#include <cmath>
 using std::cout;
 
 // x and y should have the same dimensions
 // Only same number of elements is enforced
 template <class Mat>
-double norm2(const Mat& x, const Mat& y) {
+double norm(const Mat& x, const Mat& y) {
 	class size_mismatch{};
 	if (x.numElts() != y.numElts()) {
 		size_mismatch s;
@@ -20,7 +21,16 @@ double norm2(const Mat& x, const Mat& y) {
 		double diff = x(i)-y(i);
 		sum += diff*diff;
 	}
-	return sum;
+	return std::sqrt(sum);
+}
+
+template <class Mat>
+double norm(const Mat& x) {
+	double sum = 0;
+	for (size_t i = 0; i < x.numElts(); i++) {
+		sum += x(i)*x(i);
+	}
+	return std::sqrt(sum);
 }
 
 // Solves Ax = B for x
@@ -43,33 +53,20 @@ void SOR(const Mat& A, const Mat& B, Mat& x, double w, double convergence) {
 		size_mismatch s;
 		throw s;
 	}
-		
 
-	double difference = 2*convergence;
-
-	int iteration = 0; // Debugging
+	double difference = norm(A*x, B) / norm(B);
 	while (difference > convergence) {
-		iteration++;
-		cout << "Iteration " << iteration << '\n'; //Debugging
 		Mat xprev(x);
 		for (size_t i = 0; i < A.numRows(); i++) {
-			cout << "   i: " << i << '\n';
 			double sigma = 0;
 			for (size_t j = 0; j < B.numRows(); j++) {
-				cout << "      j: " << " A(i,j): " << A(i,j) << " X(j): " << x(j) << '\n';
 				if (j != i)  {
 					sigma += A(i,j)*x(j);
 				}
 			}
 			x(i) = x(i) + w*(((B(i) - sigma) / A(i,i)) - x(i));
-			cout << "   Sigma: " << sigma << " New x(i): " << x(i) << '\n';
-			//Maybe use different convergence criterion?
-			//Maybe problem with Matrix class? (Unlikely)
-			//Maybe problem with the test case
-			//Maybe Markov was wrong?
 		}
-		difference = norm2(xprev, x);
-		cout << "Difference: " << difference << '\n';
+		difference = norm(A*x, B) / norm(B);
 	}
 }
 
