@@ -54,9 +54,10 @@ void SOR(const Mat& A, const Mat& B, Mat& x, double w, double convergence) {
 		throw s;
 	}
 
-	double difference = norm(A*x, B) / norm(B);
+	// A*x gives wrong result
+	double normB = norm(B);
+	double difference = norm(A*x - B) / normB;
 	while (difference > convergence) {
-		Mat xprev(x);
 		for (size_t i = 0; i < A.numRows(); i++) {
 			double sigma = 0;
 			for (size_t j = 0; j < B.numRows(); j++) {
@@ -66,7 +67,7 @@ void SOR(const Mat& A, const Mat& B, Mat& x, double w, double convergence) {
 			}
 			x(i) = x(i) + w*(((B(i) - sigma) / A(i,i)) - x(i));
 		}
-		difference = norm(A*x, B) / norm(B);
+		difference = norm(A*x - B) / normB;
 	}
 }
 

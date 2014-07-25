@@ -15,8 +15,9 @@ int main() {
 	X(1) = 3.92;
 
 	cout << "A:\n" << A << "B:\n" << B << "X\n" << X;
-	SOR(A, B, X, 1.5, 0.0001);
-	cerr << "After SOR:\n" << X;
+	cout << "A*x\n" << A*X;
+	SOR(A, B, X, 1.1, 0.001);
+	cout << "After SOR:\n" << X;
 
 
 	return 0;

@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <limits>
 #include <iostream>
+#include <iomanip>
 using std::size_t; //The only reason for including cstdlib
 
 #define NAN std::numeric_limits<double>::quiet_NaN();
@@ -38,6 +39,7 @@ class Matrix {
 
 		void operator+=(const Matrix<T>&);
 		void operator*=(const Matrix<T>&);
+		void operator-=(const Matrix<T>&);
 
 		void print(std::ostream&); //Note: Type T should be printable using << operator
 
@@ -105,9 +107,17 @@ Matrix<T>::~Matrix() {
 
 template <class T>
 void Matrix<T>::print(std::ostream& out) {
+	for (size_t i = 0; i < rows; i++) {
+		for (size_t j = 0; j < cols; j++) {
+			out << std::setprecision(4) << std::setw(5) << (*this)(i,j);
+		}
+		out << '\n';
+	}	
+	/*
 	for (size_t i = 0; i < size; i++) {
 		out << array[i] << '\n';
 	}
+	*/
 }
 
 // Nonmember function, overloading output
@@ -128,6 +138,17 @@ void Matrix<T>::operator+=(const Matrix<T>& M) {
 	}
 }
 
+template <class T>
+void Matrix<T>::operator-=(const Matrix<T>& M) {
+	if (M.rows != rows or M.cols != cols) {
+		size_mismatch s;
+		throw s;
+	}
+	for (size_t i = 0; i < size; i++) {
+		array[i] -= M.array[i];
+	}
+}
+
 
 //Careful returning a reference
 //Not sure if this is bad when return value is probably temporary
@@ -135,6 +156,13 @@ template <class T>
 Matrix<T> operator+ (const Matrix<T>& A, const Matrix<T>& B) {
 	Matrix<T> C(A);
 	C += B;
+	return C;
+}
+
+template <class T>
+Matrix<T> operator- (const Matrix<T>& A, const Matrix<T>& B) {
+	Matrix<T> C(A);
+	C -= B;
 	return C;
 }
 
@@ -147,11 +175,14 @@ void Matrix<T>::operator*= (const Matrix<T>& M) {
 		throw s;
 	}
 	T* result = new T[rows*M.cols];
+	for (size_t i = 0; i < rows*M.cols; i++) {
+		result[i] = 0;
+	}
 	for (size_t i = 0; i < rows; i++) {
 		for (size_t j = 0; j < M.cols; j++) {
-			size_t index = i*M.cols+j;
+			T& entry = result[i*M.cols+j];
 			for (size_t k = 0; k < cols; k++) {
-				result[index] += (*this)(i,k)*M(k,j);
+				entry += (*this)(i,k)*M(k,j);
 			}
 		}
 	}
