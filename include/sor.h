@@ -6,24 +6,6 @@
 #include <cmath>
 using std::cout;
 
-// x and y should have the same dimensions
-// Only same number of elements is enforced
-template <class Mat>
-double norm(const Mat& x, const Mat& y) {
-	class size_mismatch{};
-	if (x.numElts() != y.numElts()) {
-		size_mismatch s;
-		throw s;
-	}
-
-	double sum = 0;
-	for (size_t i = 0; i < x.numElts(); i++) {
-		double diff = x(i)-y(i);
-		sum += diff*diff;
-	}
-	return std::sqrt(sum);
-}
-
 template <class Mat>
 double norm(const Mat& x) {
 	double sum = 0;
@@ -54,7 +36,6 @@ void SOR(const Mat& A, const Mat& B, Mat& x, double w, double convergence) {
 		throw s;
 	}
 
-	// A*x gives wrong result
 	double normB = norm(B);
 	double difference = norm(A*x - B) / normB;
 	while (difference > convergence) {
