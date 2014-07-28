@@ -40,8 +40,10 @@ class Matrix {
 		void operator+=(const Matrix<T>&);
 		void operator*=(const Matrix<T>&);
 		void operator-=(const Matrix<T>&);
-
-		void print(std::ostream&); //Note: Type T should be printable using << operator
+			
+		//Note: Type T should be printable using << operator
+		void print(std::ostream&); 
+		void write(std::ostream&); //For writing to files
 
 
 	private:
@@ -113,12 +115,15 @@ void Matrix<T>::print(std::ostream& out) {
 		}
 		out << '\n';
 	}	
-	/*
+}
+
+template <class T>
+void Matrix<T>::write(std::ostream& out) {
 	for (size_t i = 0; i < size; i++) {
 		out << array[i] << '\n';
 	}
-	*/
 }
+
 
 // Nonmember function, overloading output
 template <class T>
@@ -149,9 +154,6 @@ void Matrix<T>::operator-=(const Matrix<T>& M) {
 	}
 }
 
-
-//Careful returning a reference
-//Not sure if this is bad when return value is probably temporary
 template <class T>
 Matrix<T> operator+ (const Matrix<T>& A, const Matrix<T>& B) {
 	Matrix<T> C(A);
