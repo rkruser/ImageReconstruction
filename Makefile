@@ -1,4 +1,6 @@
-include config.mk
+#Config tailored to UMich CAEN system, may want to comment out on others
+include config.mk 
+
 VPATH = src:include:images:test #Directories searched by make
 args = -g -std=c++11 -Wall -Wextra -pedantic -Wvla 
 optimize: args = -O3 -std=c++11
