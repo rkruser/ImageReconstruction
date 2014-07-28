@@ -23,10 +23,12 @@ class Matrix {
 		class size_mismatch {};
 
 		Matrix();
-		Matrix(const Matrix<T>&);
 		Matrix(size_t, size_t);
 		Matrix(size_t, size_t, T);
+		Matrix(const Matrix<T>&);
 		Matrix<T>& operator= (const Matrix<T>&);
+		Matrix(Matrix<T>&&); //Move copy
+		Matrix<T>& operator= (Matrix<T>&&); //Move assignment
 		~Matrix();
 
 		size_t numElts() const { return size;}
@@ -96,9 +98,38 @@ Matrix<T>::Matrix(size_t r, size_t c, T fill) :
 }
 
 template <class T>
+Matrix<T>::Matrix(Matrix<T>&& M) {
+	array = M.array;
+	size = M.size;
+	rows = M.rows;
+	cols = M.cols;
+
+	M.array = nullptr;
+	M.size = M.rows = M.cols = 0;
+};
+
+template <class T>
+Matrix<T>& Matrix<T>::operator= (Matrix<T>&& M) {
+	if (this != &M) {
+		delete[] array;
+		array = M.array;
+		size = M.size;
+		rows = M.rows;
+		cols = M.cols;
+
+		M.array = nullptr;
+		M.rows = M.cols = M.size = 0;
+	}
+	return *this;
+}
+
+template <class T>
 Matrix<T>& Matrix<T>::operator= (const Matrix<T>& M) {
-	delete[] array;
-	copy(M);
+	// Self-assignment does nothing
+	if (this != &M) {
+		delete[] array;
+		copy(M);
+	}
 	return *this;
 }
 
@@ -204,6 +235,61 @@ Matrix<T> operator* (const Matrix<T>& A, const Matrix<T>& B) {
 
 //************************************************
 
+template <class T>
+class Image { 
+	public:
+		Image():
+			R(),
+			G(),
+			B(),
+			color(false){};
+		Image(size_t a, size_t b, bool c = false):
+			R(a,b),
+			color(c){
+				if (c) {
+					G = B = Matrix<T>(a,b);
+				}
+			};
+		Image(size_t a, size_t b, T v, bool c = false):
+			R(a,b,v),
+			G(),
+			B(),
+			color(c){
+				if (c) {
+					G = B = Matrix<T>(a,b,v);
+				}
+			};
+
+		class badFrame{};
+		Matrix<T>& getFrame(size_t f = 1) {
+			if (f == 1) {
+				return R;
+			}
+			else if (f == 2) { 
+				return G;
+			}
+			else if (f == 3) {
+				return B;
+			}
+			else {
+				badFrame e;
+				throw e;
+			}
+		}
+
+
+	private:
+		bool color;
+		Matrix<T> R;
+		Matrix<T> G;
+		Matrix<T> B;
+};
+
+
+
+
+
+/*
 struct Image {
 	double * array;
 	size_t size;
@@ -278,6 +364,7 @@ struct Image {
 		cols = M.cols;
 	}
 };
+*/
 
 class too_many_chars_per_pixel {};
 class not_color_format {};
