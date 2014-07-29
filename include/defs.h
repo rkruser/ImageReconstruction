@@ -31,7 +31,7 @@ class Matrix {
 		Matrix<T>& operator= (Matrix<T>&&); //Move assignment
 		~Matrix();
 
-		size_t numElts() const { return size;}
+		size_t numElts() const { return rows*cols;}
 		size_t numRows() const { return rows;}
 		size_t numCols() const { return cols;}
 		T& operator() (size_t i) { return array[i]; }
@@ -50,7 +50,6 @@ class Matrix {
 
 	private:
 		T* array;
-		size_t size;
 		size_t rows;
 		size_t cols;
 		void copy(const Matrix<T>&);
@@ -58,11 +57,10 @@ class Matrix {
 
 template <class T>
 void Matrix<T>::copy(const Matrix<T>& M) {
-	size = M.size;
 	rows = M.rows;
 	cols = M.cols;
-	array = new T[size];
-	for (size_t i = 0; i < size; i++) {
+	array = new T[rows*cols];
+	for (size_t i = 0; i < rows*cols; i++) {
 		array[i] = M.array[i];
 	}
 }
@@ -70,7 +68,6 @@ void Matrix<T>::copy(const Matrix<T>& M) {
 template <class T>
 Matrix<T>::Matrix() : 
 	array(nullptr),
-	size(0),
 	rows(0),
 	cols(0) {}
 
@@ -83,29 +80,26 @@ template <class T>
 Matrix<T>::Matrix(size_t a, size_t b) {
 	rows = a;
 	cols = b;
-	size = a*b;
-	array = new T[size];
+	array = new T[rows*cols];
 }
 
 
 template <class T>
 Matrix<T>::Matrix(size_t r, size_t c, T fill) :
-	size(r*c),
 	rows(r),
 	cols(c) {
-		array = new T[size];
-		for (size_t i = 0; i < size; i++) array[i] = fill;
+		array = new T[r*c];
+		for (size_t i = 0; i < r*c; i++) array[i] = fill;
 }
 
 template <class T>
 Matrix<T>::Matrix(Matrix<T>&& M) {
 	array = M.array;
-	size = M.size;
 	rows = M.rows;
 	cols = M.cols;
 
 	M.array = nullptr;
-	M.size = M.rows = M.cols = 0;
+	M.rows = M.cols = 0;
 };
 
 template <class T>
@@ -113,12 +107,11 @@ Matrix<T>& Matrix<T>::operator= (Matrix<T>&& M) {
 	if (this != &M) {
 		delete[] array;
 		array = M.array;
-		size = M.size;
 		rows = M.rows;
 		cols = M.cols;
 
 		M.array = nullptr;
-		M.rows = M.cols = M.size = 0;
+		M.rows = M.cols = 0;
 	}
 	return *this;
 }
@@ -150,6 +143,7 @@ void Matrix<T>::print(std::ostream& out) {
 
 template <class T>
 void Matrix<T>::write(std::ostream& out) {
+	out << rows << '\n' << cols << '\n';
 	for (size_t i = 0; i < size; i++) {
 		out << array[i] << '\n';
 	}
@@ -169,7 +163,7 @@ void Matrix<T>::operator+=(const Matrix<T>& M) {
 		size_mismatch s;
 		throw s;
 	}
-	for (size_t i = 0; i < size; i++) {
+	for (size_t i = 0; i < rows*cols; i++) {
 		array[i] += M.array[i];
 	}
 }
@@ -180,7 +174,7 @@ void Matrix<T>::operator-=(const Matrix<T>& M) {
 		size_mismatch s;
 		throw s;
 	}
-	for (size_t i = 0; i < size; i++) {
+	for (size_t i = 0; i < rows*cols; i++) {
 		array[i] -= M.array[i];
 	}
 }
@@ -236,53 +230,41 @@ Matrix<T> operator* (const Matrix<T>& A, const Matrix<T>& B) {
 //************************************************
 
 template <class T>
-class Image { 
-	public:
-		Image():
-			R(),
-			G(),
-			B(),
-			color(false){};
-		Image(size_t a, size_t b, bool c = false):
-			R(a,b),
-			color(c){
-				if (c) {
-					G = B = Matrix<T>(a,b);
-				}
-			};
-		Image(size_t a, size_t b, T v, bool c = false):
-			R(a,b,v),
-			G(),
-			B(),
-			color(c){
-				if (c) {
-					G = B = Matrix<T>(a,b,v);
-				}
-			};
+struct Image { 
+	bool color;
+	Matrix<T> R;
+	Matrix<T> G;
+	Matrix<T> B;
 
-		class badFrame{};
-		Matrix<T>& getFrame(size_t f = 1) {
-			if (f == 1) {
-				return R;
+	Image():
+		R(),
+		G(),
+		B(),
+		color(false){};
+	Image(size_t a, size_t b, bool c = false):
+		R(a,b),
+		color(c){
+			if (c) {
+				G = B = Matrix<T>(a,b);
 			}
-			else if (f == 2) { 
-				return G;
+	};
+	Image(size_t a, size_t b, T v, bool c = false):
+		R(a,b,v),
+		G(),
+		B(),
+		color(c){
+			if (c) {
+				G = B = Matrix<T>(a,b,v);
 			}
-			else if (f == 3) {
-				return B;
-			}
-			else {
-				badFrame e;
-				throw e;
-			}
-		}
+	};
 
+	T& operator() (size_t x, size_t y) {
+		return R(x,y);
+	}
+	const T& operator() (size_t x, size_t y) const {
+		return R(x,y);
+	}
 
-	private:
-		bool color;
-		Matrix<T> R;
-		Matrix<T> G;
-		Matrix<T> B;
 };
 
 
