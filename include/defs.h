@@ -100,7 +100,7 @@ Matrix<T>::Matrix(Matrix<T>&& M) {
 
 	M.array = nullptr;
 	M.rows = M.cols = 0;
-};
+}
 
 template <class T>
 Matrix<T>& Matrix<T>::operator= (Matrix<T>&& M) {
@@ -144,7 +144,7 @@ void Matrix<T>::print(std::ostream& out) {
 template <class T>
 void Matrix<T>::write(std::ostream& out) {
 	out << rows << '\n' << cols << '\n';
-	for (size_t i = 0; i < size; i++) {
+	for (size_t i = 0; i < rows*cols; i++) {
 		out << array[i] << '\n';
 	}
 }
@@ -215,7 +215,6 @@ void Matrix<T>::operator*= (const Matrix<T>& M) {
 	}
 	delete[] array;
 	array = result;
-	size = rows*M.cols;
 	cols = M.cols;
 }
 
