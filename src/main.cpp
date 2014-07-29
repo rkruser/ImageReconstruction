@@ -23,10 +23,7 @@ int main(){
 	timer = std::clock();
 	Image M;
 	try {
-		M = imProcess(IMAGE);
-		if (BLACK_AND_WHITE) {
-			M = makeGrayScale(M);
-		}
+		M = imProcess(IMAGE, BLACK_AND_WHITE);
 	}
 	catch (too_many_chars_per_pixel e) {
 		std::cerr << "Too many chars per pixel\n";

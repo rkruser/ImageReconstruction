@@ -228,12 +228,11 @@ Matrix<T> operator* (const Matrix<T>& A, const Matrix<T>& B) {
 
 //************************************************
 
-template <class T>
 struct Image { 
 	bool color;
-	Matrix<T> R;
-	Matrix<T> G;
-	Matrix<T> B;
+	Matrix<double> R;
+	Matrix<double> G;
+	Matrix<double> B;
 
 	Image():
 		R(),
@@ -244,23 +243,23 @@ struct Image {
 		R(a,b),
 		color(c){
 			if (c) {
-				G = B = Matrix<T>(a,b);
+				G = B = Matrix<double>(a,b);
 			}
 	};
-	Image(size_t a, size_t b, T v, bool c = false):
+	Image(size_t a, size_t b, double v, bool c = false):
 		R(a,b,v),
 		G(),
 		B(),
 		color(c){
 			if (c) {
-				G = B = Matrix<T>(a,b,v);
+				G = B = Matrix<double>(a,b,v);
 			}
 	};
 
-	T& operator() (size_t x, size_t y) {
+	double& operator() (size_t x, size_t y) {
 		return R(x,y);
 	}
-	const T& operator() (size_t x, size_t y) const {
+	const double& operator() (size_t x, size_t y) const {
 		return R(x,y);
 	}
 

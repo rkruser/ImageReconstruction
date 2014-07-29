@@ -33,7 +33,7 @@ Image makeGrayScale(const Image& M) {
 }
 
 // Turn the included xpm file into an image object
-Image imProcess(const char** m) {
+Image imProcess(const char** m, bool colored) {
  // Read first line
  // Extract numbers
  // Hash table of colors
@@ -74,16 +74,18 @@ Image imProcess(const char** m) {
 	}
 
 	//Form the image
-	Image M(rows, columns, 3);
+	Image M(rows, columns, colored);
 	for (int i = 0; i < rows; ++i) {
 		std::stringstream str(m[pos+i]);
 		for (int j = 0; j < columns; ++j) {
 			char s[CHARBUFFER];
 			str.get(s,charsPerPixel+1);
 			RGB& pixel = colorTable.at(std::string(s));
-			M(i,j,0) = pixel.r;
-			M(i,j,1) = pixel.g;
-			M(i,j,2) = pixel.b;
+			M(i,j) = pixel.r;
+			if (colored) {
+				M.G(i,j) = pixel.g;
+				M.B(i,j) = pixel.b;
+			}
 		}
 	}
 
@@ -92,17 +94,11 @@ Image imProcess(const char** m) {
 
 // Print the image to the desired ostream object
 void printImage(std::ostream& out, const Image& M) {
-	int numberOfTimes = 1;
-	if (M.frames == 1) numberOfTimes = 3;
-	for (int n = 1; n <= numberOfTimes; n++) {
-		for (size_t l = 0; l < M.size; ++l) {
-			if (std::isnan(M(l))) {
-				out << 255 << '\n';
-			}
-			else {
-				out << M(l) << '\n';
-			}
-		}
+	out << M.color << '\n';
+	M.R.write(out);
+	if (M.color) {
+		M.G.write(out);
+		M.B.write(out);
 	}
 }
 
