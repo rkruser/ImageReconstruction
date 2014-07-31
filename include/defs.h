@@ -50,6 +50,7 @@ class Matrix {
 
 	private:
 		T* array;
+		bool transpose;
 		size_t rows;
 		size_t cols;
 		void copy(const Matrix<T>&);
