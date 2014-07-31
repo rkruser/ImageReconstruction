@@ -11,16 +11,16 @@ int main() {
 	M(1,1) = 5;
 	M(1,2) = 6;
 
-	cout << M;
-	M.transpose();
-	cout << M;
-	M.transpose();
-	cout << M;
-	M.transpose();
-	cout << M;
+	cout << M << '\n';
+	M.shallowTranspose();
+	cout << M << '\n';
+	M.shallowTranspose();
+	cout << M << '\n';
+	M.shallowTranspose();
+	cout << M << '\n';
 	auto M2 = M;
-	M2.transpose();
-	cout << M*M2;
+	M2.shallowTranspose();
+	cout << M*M2 << '\n';
 
 
 

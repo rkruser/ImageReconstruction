@@ -4,6 +4,7 @@
 #include <limits>
 #include <iostream>
 #include <iomanip>
+#include <utility>
 using std::size_t; //The only reason for including cstdlib
 
 #define NAN std::numeric_limits<double>::quiet_NaN();
@@ -34,13 +35,53 @@ class Matrix {
 		size_t numElts() const { return rows*cols;}
 		size_t numRows() const { return rows;}
 		size_t numCols() const { return cols;}
-		T& operator() (size_t i) { return array[i]; }
-		const T& operator() (size_t i) const { return array[i]; }
-		T& operator() (size_t i, size_t j) { return array[i*cols+j]; }
-		const T& operator() (size_t i, size_t j) 
-			const { return array[i*cols+j]; }
+		T& operator() (size_t i) { 
+			if (transpose) {
+				return array[(i%cols)*rows+i/cols];
+			}
+			else {
+				return array[i]; 
+			}
+		}
+		const T& operator() (size_t i) const { 
+			if (transpose) {
+				return array[(i%cols)*rows+i/cols];
+			}
+			else {
+				return array[i]; 
+			}
+		}
+		T& operator() (size_t i, size_t j) { 
+			if (transpose) {
+				return array[j*rows+i];
+			}
+			else {
+				return array[i*cols+j]; 
+			}
+		}
+		const T& operator() (size_t i, size_t j) const { 
+			if (transpose) {
+				return array[j*rows+i];
+			}
+			else {
+				return array[i*cols+j]; 
+			}
+		}
+		// Access elements as if array was transposed
+		T& tAccess ( size_t i, size_t j) { return array[j*cols+i]; }
+		T& tAccess(size_t i) { return array[(i%rows)*cols+i/rows]; }
+		const T& tAccess(size_t i, size_t j) { return array[j*cols+i]; }
+		const T& tAccess(size_t i) { return array[(i%rows)*cols+i/rows]; }
 
-		void transpose();
+		// Access elements the way they are layed out in memory
+		T& nAccess ( size_t i, size_t j) { return array[i*cols+j]; }
+		T& nAccess(size_t i) { return array[i]; }
+		const T& nAccess(size_t i, size_t j) { return array[i*cols+j]; }
+		const T& nAccess(size_t i) { return array[i]; }
+
+
+		void deepTranspose();
+		void shallowTranspose();
 
 		void operator+=(const Matrix<T>&);
 		void operator*=(const Matrix<T>&);
@@ -61,11 +102,12 @@ class Matrix {
 
 template <class T>
 void Matrix<T>::copy(const Matrix<T>& M) {
+	transpose = false;
 	rows = M.rows;
 	cols = M.cols;
 	array = new T[rows*cols];
 	for (size_t i = 0; i < rows*cols; i++) {
-		array[i] = M.array[i];
+		array[i] = M(i); //Effectively makes deep transpose of M
 	}
 }
 
@@ -73,7 +115,9 @@ template <class T>
 Matrix<T>::Matrix() : 
 	array(nullptr),
 	rows(0),
-	cols(0) {}
+	cols(0),
+	transpose(false)
+	{}
 
 template <class T>
 Matrix<T>::Matrix(const Matrix& M) {
@@ -85,13 +129,16 @@ Matrix<T>::Matrix(size_t a, size_t b) {
 	rows = a;
 	cols = b;
 	array = new T[rows*cols];
+	transpose = false;
 }
 
 
 template <class T>
 Matrix<T>::Matrix(size_t r, size_t c, T fill) :
 	rows(r),
-	cols(c) {
+	cols(c),
+	transpose(false)
+	{
 		array = new T[r*c];
 		for (size_t i = 0; i < r*c; i++) array[i] = fill;
 }
@@ -101,6 +148,7 @@ Matrix<T>::Matrix(Matrix<T>&& M) {
 	array = M.array;
 	rows = M.rows;
 	cols = M.cols;
+	transpose = M.transpose;
 
 	M.array = nullptr;
 	M.rows = M.cols = 0;
@@ -113,6 +161,7 @@ Matrix<T>& Matrix<T>::operator= (Matrix<T>&& M) {
 		array = M.array;
 		rows = M.rows;
 		cols = M.cols;
+		transpose = M.transpose;
 
 		M.array = nullptr;
 		M.rows = M.cols = 0;
@@ -136,18 +185,15 @@ Matrix<T>::~Matrix() {
 }
 
 template <class T>
-void Matrix<T>::transpose() {
-	T* newArray = new T[rows*cols];
-	for (size_t j = 0; j < cols; j++) {
-		for (size_t i = 0; i < rows; i++) {
-			newArray[j*rows+i] = (*this)(i,j);
-		}
-	}
-	delete[] array;
-	array = newArray;
-	size_t placeholder = rows;
-	rows = cols;
-	cols = placeholder;
+void Matrix<T>::deepTranspose() {
+	Matrix<T> newMat(*this);
+	*this = newMat; //Hopefully invokes move assignment
+}
+
+template <class T>
+void Matrix<T>::shallowTranspose() {
+	transpose = !transpose;
+	std::swap(rows,cols);
 }
 
 template <class T>
@@ -164,7 +210,7 @@ template <class T>
 void Matrix<T>::write(std::ostream& out) const {
 	out << rows << '\n' << cols << '\n';
 	for (size_t i = 0; i < rows*cols; i++) {
-		out << array[i] << '\n';
+		out << (*this)(i) << '\n';
 	}
 }
 
@@ -176,6 +222,7 @@ std::ostream& operator<< (std::ostream& out, Matrix<T> M) {
 	return out;
 }
 
+// These will need to be changed in event of tranpose
 template <class T>
 void Matrix<T>::operator+=(const Matrix<T>& M) {
 	if (M.rows != rows or M.cols != cols) {
@@ -183,7 +230,7 @@ void Matrix<T>::operator+=(const Matrix<T>& M) {
 		throw s;
 	}
 	for (size_t i = 0; i < rows*cols; i++) {
-		array[i] += M.array[i];
+		(*this)(i) += M(i);
 	}
 }
 
@@ -194,7 +241,7 @@ void Matrix<T>::operator-=(const Matrix<T>& M) {
 		throw s;
 	}
 	for (size_t i = 0; i < rows*cols; i++) {
-		array[i] -= M.array[i];
+		(*this)(i) -= M(i);
 	}
 }
 
@@ -235,6 +282,7 @@ void Matrix<T>::operator*= (const Matrix<T>& M) {
 	delete[] array;
 	array = result;
 	cols = M.cols;
+	transpose = false;
 }
 
 template <class T>
