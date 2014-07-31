@@ -3,7 +3,7 @@
 
 #include "defs.h"
 
-void naivenn(Image&, int);
+void naivenn(Matrix<double>&, int);
  
 struct spiralIterator {
 	int x;

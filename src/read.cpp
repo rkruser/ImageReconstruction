@@ -21,11 +21,11 @@ RGB extractPixels(int n) {
 
 // Make a color image into a black and white image
 Image makeGrayScale(const Image& M) {
-	if (M.frames <= 1) return M;
-	Image newIm(M.rows,M.cols,1);
-	for (size_t i = 0; i < M.rows; ++i) {
-		for (size_t j = 0; j < M.cols; ++j) {
-			newIm(i,j,0) = std::round(0.2989*M(i,j,0)+0.5870*M(i,j,1)+0.1140*M(i,j,2));
+	if (!M.color) return M;
+	Image newIm(M.R.numRows(),M.R.numCols(),false);
+	for (size_t i = 0; i < M.R.numRows(); ++i) {
+		for (size_t j = 0; j < M.R.numCols(); ++j) {
+			newIm(i,j) = std::round(0.2989*M.R(i,j)+0.5870*M.G(i,j)+0.1140*M.B(i,j));
 			//The numbers come from the literature on apparent brightness of various colors
 		}
 	}

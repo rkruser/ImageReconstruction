@@ -24,17 +24,22 @@ double norm(const Mat& x) {
 // Function is templated to accomodate different matrix types
 // 	that have the same operators.
 template <class Mat> 
-void SOR(const Mat& A, const Mat& B, Mat& x, double w, double convergence) {
+void SOR(const Mat& A2, const Mat& B2, Mat& x, double w, double convergence) {
 	class not_square {};
 	class size_mismatch{};
-	if (A.numRows() != A.numCols()) {
+	if (A2.numRows() != A2.numCols()) {
 		not_square n;
 		throw n;
 	}
-	if (B.numRows() != A.numRows() or x.numRows() != A.numRows()) {
+	if (B2.numRows() != A2.numRows() or x.numRows() != A2.numRows()) {
 		size_mismatch s;
 		throw s;
 	}
+
+	Mat A(A2);
+	A.transpose();
+	Mat B = A*B2;
+	A = A*A2;
 
 	double normB = norm(B);
 	double difference = norm(A*x - B) / normB;

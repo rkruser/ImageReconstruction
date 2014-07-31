@@ -3,7 +3,7 @@
 
 #include "defs.h"
 
-void makeSparse(Image&, double);
+void makeSparse(Matrix<double>&, double);
 
 
 #endif

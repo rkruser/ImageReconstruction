@@ -7,24 +7,24 @@
 class PoutOfRange{};
 
 // Set 100*P percent of the pixels of M as nan
-void makeSparse(Image& M, double P) {
+void makeSparse(Matrix<double>& M, double P) {
 	if (P < 0 or P > 1) {
 		PoutOfRange e;
 		throw e;
 	}
 	int numRemoved;
 	if (P > 0.5) {
-		numRemoved = (1-P)*M.size;
+		numRemoved = (1-P)*M.numElts();
 	}
 	else {
-		numRemoved = P*M.size;
+		numRemoved = P*M.numElts();
 	}
 
-	std::vector<bool> toChange(M.size, false);
+	std::vector<bool> toChange(M.numElts(), false);
 	for (int i = 1; i <= numRemoved; ++i) {
-		int index = std::rand()%M.size;
+		int index = std::rand()%M.numElts();
 		while (toChange[index]) {
-			index = std::rand()%M.size;
+			index = std::rand()%M.numElts();
 		}
 		toChange[index] = true;
 	}
@@ -33,7 +33,7 @@ void makeSparse(Image& M, double P) {
 		toChange.flip();
 	}
 
-	for (size_t i = 0; i < M.size; ++i) {
+	for (size_t i = 0; i < M.numElts(); ++i) {
 		if (toChange[i]) {
 			M(i) = NAN;
 		}

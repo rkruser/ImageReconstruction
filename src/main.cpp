@@ -41,10 +41,18 @@ int main(){
 	// Problem: for some reason, the online xpm file converter only retains 256 colors,
 	// diminishing image quality for color images
 	Image sparseImage(M);
-	makeSparse(sparseImage, 0.7);
-	Image naiveRepair(sparseImage);
-	naivenn(naiveRepair, 2);
+	makeSparse(sparseImage.R, 0.7);
+	if (sparseImage.color) {
+		makeSparse(sparseImage.G, 0.7);
+		makeSparse(sparseImage.B, 0.7);
+	}
 
+	Image naiveRepair(sparseImage);
+	naivenn(naiveRepair.R, 2);
+	if (naiveRepair.color) {
+		naivenn(naiveRepair.G, 2);
+		naivenn(naiveRepair.B, 2);
+	}
 
 	std::ofstream f1, f2, f3;
 	f1.open("./output/original.txt");

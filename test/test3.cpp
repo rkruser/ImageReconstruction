@@ -22,7 +22,7 @@ int main() {
 	SOR(A, B, X, 1.1, 0.001);
 	cout << "After SOR:\n" << X;
 	*/
-
+/*
 	Matrix<double> A2(3,3,0), B2(3,1,0), X2(3,1,0);
 	A2(0,0) = 2;
 	A2(0,1) = -1;
@@ -43,7 +43,19 @@ int main() {
 	cout << "A*x\n" << A2*X2;
 	SOR(A2, B2, X2, 1.1, 0.00001);
 	cout << "After SOR:\n" << X2;
-
+*/
+	Matrix<double> A3(2,2,0), B3(2,1,0), X3(2,1,0);
+	A3(0,0) = 2;
+	A3(0,1) = 2;
+	A3(1,0) = 2;
+	A3(1,1) = 1;
+	B3(0) = 10;
+	B3(1) = 6;
+	X3(0) = 1.5;
+	X3(1) = 3.5;
+	cout << "A:\n" << A3 << "B:\n" << B3 << "X\n" << X3;
+	SOR(A3, B3, X3, 1.1, 0.00001);
+	cout << "After SOR:\n" << X3;
 
 
 	return 0;

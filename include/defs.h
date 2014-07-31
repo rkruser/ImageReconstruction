@@ -37,15 +37,18 @@ class Matrix {
 		T& operator() (size_t i) { return array[i]; }
 		const T& operator() (size_t i) const { return array[i]; }
 		T& operator() (size_t i, size_t j) { return array[i*cols+j]; }
-		const T& operator() (size_t i, size_t j) const { return array[i*cols+j]; }
+		const T& operator() (size_t i, size_t j) 
+			const { return array[i*cols+j]; }
+
+		void transpose();
 
 		void operator+=(const Matrix<T>&);
 		void operator*=(const Matrix<T>&);
 		void operator-=(const Matrix<T>&);
 			
 		//Note: Type T should be printable using << operator
-		void print(std::ostream&); 
-		void write(std::ostream&); //For writing to files
+		void print(std::ostream&) const; 
+		void write(std::ostream&) const; //For writing to files
 
 
 	private:
@@ -132,7 +135,22 @@ Matrix<T>::~Matrix() {
 }
 
 template <class T>
-void Matrix<T>::print(std::ostream& out) {
+void Matrix<T>::transpose() {
+	T* newArray = new T[rows*cols];
+	for (size_t j = 0; j < cols; j++) {
+		for (size_t i = 0; i < rows; i++) {
+			newArray[j*rows+i] = (*this)(i,j);
+		}
+	}
+	delete[] array;
+	array = newArray;
+	size_t placeholder = rows;
+	rows = cols;
+	cols = placeholder;
+}
+
+template <class T>
+void Matrix<T>::print(std::ostream& out) const {
 	for (size_t i = 0; i < rows; i++) {
 		for (size_t j = 0; j < cols; j++) {
 			out << std::setprecision(4) << std::setw(5) << (*this)(i,j);
@@ -142,7 +160,7 @@ void Matrix<T>::print(std::ostream& out) {
 }
 
 template <class T>
-void Matrix<T>::write(std::ostream& out) {
+void Matrix<T>::write(std::ostream& out) const {
 	out << rows << '\n' << cols << '\n';
 	for (size_t i = 0; i < rows*cols; i++) {
 		out << array[i] << '\n';
