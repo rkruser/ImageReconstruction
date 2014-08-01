@@ -48,10 +48,10 @@ int main(){
 	}
 
 	Image naiveRepair(sparseImage);
-	naivenn(naiveRepair.R, 2);
+	naivenn(naiveRepair.R, 16);
 	if (naiveRepair.color) {
-		naivenn(naiveRepair.G, 2);
-		naivenn(naiveRepair.B, 2);
+		naivenn(naiveRepair.G, 16);
+		naivenn(naiveRepair.B, 16);
 	}
 
 	std::ofstream f1, f2, f3;
