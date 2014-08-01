@@ -6,7 +6,7 @@
 */
 #define IMAGE beach
 #include "beach.xpm"
-#define BLACK_AND_WHITE true
+#define COLORED false
 
 #include "defs.h"
 #include "read.h"
@@ -23,7 +23,7 @@ int main(){
 	timer = std::clock();
 	Image M;
 	try {
-		M = imProcess(IMAGE, BLACK_AND_WHITE);
+		M = imProcess(IMAGE, COLORED);
 	}
 	catch (too_many_chars_per_pixel e) {
 		std::cerr << "Too many chars per pixel\n";
