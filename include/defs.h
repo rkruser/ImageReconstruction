@@ -36,48 +36,32 @@ class Matrix {
 		size_t numRows() const { return rows;}
 		size_t numCols() const { return cols;}
 		T& operator() (size_t i) { 
-			if (transpose) {
-				return array[(i%cols)*rows+i/cols];
-			}
-			else {
-				return array[i]; 
-			}
+			if (transpose) return array[(i%cols)*rows+i/cols];
+			else return array[i];
 		}
 		const T& operator() (size_t i) const { 
-			if (transpose) {
-				return array[(i%cols)*rows+i/cols];
-			}
-			else {
-				return array[i]; 
-			}
+			if (transpose) return array[(i%cols)*rows+i/cols];
+			else return array[i];
 		}
 		T& operator() (size_t i, size_t j) { 
-			if (transpose) {
-				return array[j*rows+i];
-			}
-			else {
-				return array[i*cols+j]; 
-			}
+			if (transpose) return array[j*rows+i];
+			else return array[i*cols+j]; 
 		}
 		const T& operator() (size_t i, size_t j) const { 
-			if (transpose) {
-				return array[j*rows+i];
-			}
-			else {
-				return array[i*cols+j]; 
-			}
+			if (transpose) return array[j*rows+i];
+			else return array[i*cols+j];
 		}
 		// Access elements as if array was transposed
 		T& tAccess ( size_t i, size_t j) { return array[j*cols+i]; }
 		T& tAccess(size_t i) { return array[(i%rows)*cols+i/rows]; }
-		const T& tAccess(size_t i, size_t j) { return array[j*cols+i]; }
-		const T& tAccess(size_t i) { return array[(i%rows)*cols+i/rows]; }
+		const T& tAccess(size_t i, size_t j) const { return array[j*cols+i]; }
+		const T& tAccess(size_t i) const { return array[(i%rows)*cols+i/rows]; }
 
 		// Access elements the way they are layed out in memory
 		T& nAccess ( size_t i, size_t j) { return array[i*cols+j]; }
 		T& nAccess(size_t i) { return array[i]; }
-		const T& nAccess(size_t i, size_t j) { return array[i*cols+j]; }
-		const T& nAccess(size_t i) { return array[i]; }
+		const T& nAccess(size_t i, size_t j) const { return array[i*cols+j]; }
+		const T& nAccess(size_t i) const { return array[i]; }
 
 
 		void deepTranspose();
@@ -114,9 +98,9 @@ void Matrix<T>::copy(const Matrix<T>& M) {
 template <class T>
 Matrix<T>::Matrix() : 
 	array(nullptr),
+	transpose(false),
 	rows(0),
-	cols(0),
-	transpose(false)
+	cols(0)
 	{}
 
 template <class T>
@@ -135,9 +119,9 @@ Matrix<T>::Matrix(size_t a, size_t b) {
 
 template <class T>
 Matrix<T>::Matrix(size_t r, size_t c, T fill) :
+	transpose(false),
 	rows(r),
-	cols(c),
-	transpose(false)
+	cols(c)
 	{
 		array = new T[r*c];
 		for (size_t i = 0; i < r*c; i++) array[i] = fill;
@@ -302,22 +286,22 @@ struct Image {
 	Matrix<double> B;
 
 	Image():
+		color(false),
 		R(),
 		G(),
-		B(),
-		color(false){};
+		B(){};
 	Image(size_t a, size_t b, bool c = false):
-		R(a,b),
-		color(c){
+		color(c),
+		R(a,b) {
 			if (c) {
 				G = B = Matrix<double>(a,b);
 			}
 	};
 	Image(size_t a, size_t b, double v, bool c = false):
+		color(c),
 		R(a,b,v),
 		G(),
-		B(),
-		color(c){
+		B() {
 			if (c) {
 				G = B = Matrix<double>(a,b,v);
 			}
