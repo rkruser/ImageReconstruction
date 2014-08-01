@@ -63,7 +63,6 @@ class Matrix {
 		const T& nAccess(size_t i, size_t j) const { return array[i*cols+j]; }
 		const T& nAccess(size_t i) const { return array[i]; }
 
-
 		void deepTranspose();
 		void shallowTranspose();
 
@@ -155,7 +154,6 @@ Matrix<T>& Matrix<T>::operator= (Matrix<T>&& M) {
 
 template <class T>
 Matrix<T>& Matrix<T>::operator= (const Matrix<T>& M) {
-	// Self-assignment does nothing
 	if (this != &M) {
 		delete[] array;
 		copy(M);
@@ -170,8 +168,11 @@ Matrix<T>::~Matrix() {
 
 template <class T>
 void Matrix<T>::deepTranspose() {
-	Matrix<T> newMat(*this);
-	*this = newMat; //Hopefully invokes move assignment
+	shallowTranspose();
+	if (transpose) {
+		Matrix<T> newMat(*this);
+		*this = std::move(newMat); 
+	}
 }
 
 template <class T>
