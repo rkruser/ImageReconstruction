@@ -1,5 +1,7 @@
 #include "defs.h"
 
+#include <ostream>
+#include <iomanip>
 #include <vector>
 
 
@@ -9,9 +11,12 @@ template <class T>
 class Submatrix {
 	public:
 		Submatrix(Matrix<T>& mat) : M(mat) {};
-		~Submatrix() {
-		   	indices.~vector<size_t>();
-		}
+		Submatrix(Matrix<T>& mat, const std::vector<size_t>& v) : 
+			M(mat), 
+			indices(v) {};
+		Submatrix(Matrix<T>& mat, const Submatrix<T>& s) :
+			M(mat),
+			indices(s.indices) {};
 
 		void pushIndex(size_t i) {
 			indices.push_back(i);
@@ -29,13 +34,13 @@ class Submatrix {
 		const T& operator() (size_t i) const {
 			return M(indices[i/numCols()], i%numCols());
 		}	
-		size_t numRows() {
+		size_t numRows() const {
 			return indices.size();
 		}
-		size_t numCols() {
+		size_t numCols() const {
 			return M.numCols();
 		}
-		size_t numElts() {
+		size_t numElts() const {
 			return indices.size()*M.numCols();
 		}
 
@@ -51,10 +56,37 @@ class Submatrix {
 		template <class S>
 		void operator*= (const S&);
 
+		void print(std::ostream&);
+		void write(std::ostream&);
+
 	private:
 		Matrix<T>& M;
 		std::vector<size_t> indices;
 };
+
+template <class T>
+void Submatrix<T>::print(std::ostream& out) {
+	for (size_t i = 0; i < numRows(); i++) {
+		for (size_t j = 0; j < numCols(); j++) {
+			out << std::setw(5) << (*this)(i,j);
+		}
+		out << '\n';
+	}
+}
+
+template <class T>
+void Submatrix<T>::write(std::ostream& out) {
+	out << numRows() << '\n' << numCols() << '\n';
+	for (size_t i = 0; i < numRows()*numCols(); i++) {
+		out << (*this)(i) << '\n';
+	}
+}
+
+template <class T>
+std::ostream& operator<< (std::ostream& out, Submatrix<T> S) {
+	S.print(out);
+	return out;
+}
 
 template <class T>
 template <class S>
