@@ -420,6 +420,16 @@ Matrix<T> operator/ (T a, const Matrix<T>& B) {
 	return C;
 }
 
+//***********************************************
+
+Matrix<double> identity(size_t size) {
+	Matrix<double> I(size,size,0);
+	for (size_t i = 0; i < size; i++) {
+		I(i,i) = 1;
+	}
+	return I;
+}
+
 //************************************************
 
 struct Image { 
