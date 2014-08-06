@@ -26,10 +26,19 @@ class Matrix {
 		Matrix();
 		Matrix(size_t, size_t);
 		Matrix(size_t, size_t, T);
-		Matrix(const Matrix<T>&);
-		Matrix<T>& operator= (const Matrix<T>&);
-		Matrix(Matrix<T>&&); //Move copy
-		Matrix<T>& operator= (Matrix<T>&&); //Move assignment
+		
+		template <class S>
+		Matrix(const Matrix<S>&);
+
+		template <class S>
+		Matrix<T>& operator= (const Matrix<S>&);
+
+		template <class S>
+		Matrix(Matrix<S>&&); //Move copy
+
+		template <class S>
+		Matrix<T>& operator= (Matrix<S>&&); //Move assignment
+
 		~Matrix();
 
 		size_t numElts() const { return rows*cols;}
@@ -80,11 +89,14 @@ class Matrix {
 		bool transpose;
 		size_t rows;
 		size_t cols;
-		void copy(const Matrix<T>&);
+
+		template <class S>
+		void copy(const Matrix<S>&);
 };
 
 template <class T>
-void Matrix<T>::copy(const Matrix<T>& M) {
+template <class S>
+void Matrix<T>::copy(const Matrix<S>& M) {
 	transpose = false;
 	rows = M.rows;
 	cols = M.cols;
@@ -103,7 +115,8 @@ Matrix<T>::Matrix() :
 	{}
 
 template <class T>
-Matrix<T>::Matrix(const Matrix& M) {
+template <class S>
+Matrix<T>::Matrix(const Matrix<S>& M) {
 	copy(M);
 }
 
@@ -127,7 +140,8 @@ Matrix<T>::Matrix(size_t r, size_t c, T fill) :
 }
 
 template <class T>
-Matrix<T>::Matrix(Matrix<T>&& M) {
+template <class S>
+Matrix<T>::Matrix(Matrix<S>&& M) {
 	array = M.array;
 	rows = M.rows;
 	cols = M.cols;
@@ -138,7 +152,8 @@ Matrix<T>::Matrix(Matrix<T>&& M) {
 }
 
 template <class T>
-Matrix<T>& Matrix<T>::operator= (Matrix<T>&& M) {
+template <class S>
+Matrix<T>& Matrix<T>::operator= (Matrix<S>&& M) {
 	if (this != &M) {
 		delete[] array;
 		array = M.array;
@@ -153,7 +168,8 @@ Matrix<T>& Matrix<T>::operator= (Matrix<T>&& M) {
 }
 
 template <class T>
-Matrix<T>& Matrix<T>::operator= (const Matrix<T>& M) {
+template <class S>
+Matrix<T>& Matrix<T>::operator= (const Matrix<S>& M) {
 	if (this != &M) {
 		delete[] array;
 		copy(M);
@@ -278,6 +294,41 @@ Matrix<T> operator* (const Matrix<T>& A, const Matrix<T>& B) {
 	return C;
 }
 
+template <class T>
+Matrix<T> operator* (const Matrix<T>& A, double b) {
+	Matrix<T> C(A);
+	for (size_t i = 0; i < C.numElts(); i++) {
+		C(i) *= b;
+	}
+	return C;
+}
+
+template <class T>
+Matrix<T> operator* (double a, const Matrix<T>& B) {
+	Matrix<T> C(B);
+	for (size_t i = 0; i < C.numElts(); i++) {
+		C(i) *= a;
+	}
+	return C;
+}
+
+template <class T>
+Matrix<T> operator/ (const Matrix<T>& A, double b) {
+	Matrix<T> C(A);
+	for (size_t i = 0; i < C.numElts(); i++) {
+		C(i) /= b;
+	}
+	return C;
+}
+
+template <class T>
+Matrix<T> operator/ (double a, const Matrix<T>& B) {
+	Matrix<T> C(B);
+	for (size_t i = 0; i < C.numElts(); i++) {
+		C(i) = a / C(i);
+	}
+	return C;
+}
 
 //************************************************
 
