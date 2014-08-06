@@ -37,7 +37,7 @@ class Matrix {
 
 		// Templated constructor for type conversion
 		template <class S>
-		Matrix(const Matrix<S>&);
+		explicit Matrix(const Matrix<S>&);
 
 		template <class S>
 		Matrix<T>& operator= (const Matrix<S>&);
@@ -468,8 +468,10 @@ Matrix<T> operator/ (S a, const Matrix<T>& B) {
 
 //***********************************************
 
-Matrix<double> identity(size_t size) {
-	Matrix<double> I(size,size,0);
+template <class U>
+Matrix<U> identity(U size) {
+	size_t intSize = size_t(size);
+	Matrix<U> I(intSize,intSize,0);
 	for (size_t i = 0; i < size; i++) {
 		I(i,i) = 1;
 	}

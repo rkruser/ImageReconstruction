@@ -4,7 +4,7 @@
 using namespace std;
 
 int main() {
-	Matrix<double> M = identity(6);
+	Matrix<double> M = identity(6.00);
 	cout << M << '\n';
 	cout << 2*M << '\n';
 	cout << M*2 << '\n';
