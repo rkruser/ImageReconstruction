@@ -24,22 +24,14 @@ class Matrix {
 	public:
 		class size_mismatch {};
 
+		// Fundamental functions
 		Matrix();
 		Matrix(size_t, size_t);
 		Matrix(size_t, size_t, T);
-		
-		template <class S>
-		explicit Matrix(const Matrix<S>&);
-
-		template <class S>
-		Matrix<T>& operator= (const Matrix<S>&);
-
-		template <class S>
-		Matrix(Matrix<S>&&); //Move copy
-
-		template <class S>
-		Matrix<T>& operator= (Matrix<S>&&); //Move assignment
-
+		Matrix(const Matrix<T>&); //Copy constructor
+		Matrix<T>& operator= (const Matrix<T>&); //Assignment operator
+		Matrix(Matrix<T>&&); //Move copy
+		Matrix<T>& operator= (Matrix<T>&&); //Move assignment
 		~Matrix();
 
 		// Array size data
@@ -128,10 +120,10 @@ Matrix<T>::Matrix() :
 	cols(0)
 	{}
 
+
 // Copy constructor
 template <class T>
-template <class S>
-Matrix<T>::Matrix(const Matrix<S>& M) {
+Matrix<T>::Matrix(const Matrix<T>& M) {
 	copy(M);
 }
 
@@ -157,8 +149,7 @@ Matrix<T>::Matrix(size_t r, size_t c, T fill) :
 
 // Standard Assignment operator
 template <class T>
-template <class S>
-Matrix<T>& Matrix<T>::operator= (const Matrix<S>& M) {
+Matrix<T>& Matrix<T>::operator= (const Matrix<T>& M) {
 	if (this != &M) {
 		delete[] array;
 		copy(M);
@@ -169,38 +160,25 @@ Matrix<T>& Matrix<T>::operator= (const Matrix<S>& M) {
 
 // Move copy 
 template <class T>
-template <class S>
-Matrix<T>::Matrix(Matrix<S>&& M) {
-	if (typeid(S) == typeid(T)) {
-		array = M.array;
-		rows = M.rows;
-		cols = M.cols;
-		transpose = M.transpose;
-	}
-	else {
-		copy(M);
-		delete[] M.array;
-	}
+Matrix<T>::Matrix(Matrix<T>&& M) {
+	array = M.array;
+	rows = M.rows;
+	cols = M.cols;
+	transpose = M.transpose;
+
 	M.array = nullptr;
 	M.rows = M.cols = 0;
 }
 
 // Move assignment
 template <class T>
-template <class S>
-Matrix<T>& Matrix<T>::operator= (Matrix<S>&& M) {
+Matrix<T>& Matrix<T>::operator= (Matrix<T>&& M) {
 	if (this != &M) {
 		delete[] array;
-		if (typeid(T) == typeid(S)) {
-			array = M.array;
-			rows = M.rows;
-			cols = M.cols;
-			transpose = M.transpose;
-		}
-		else {
-			copy(M);
-			delete[] M.array;
-		}
+		array = M.array;
+		rows = M.rows;
+		cols = M.cols;
+		transpose = M.transpose;
 
 		M.array = nullptr;
 		M.rows = M.cols = 0;
