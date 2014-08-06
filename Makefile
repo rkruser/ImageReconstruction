@@ -26,6 +26,8 @@ test4.test: test4.cpp defs.h
 	g++ -o test4.test $(args) $(inc) $<
 test5.test: test5.cpp submatrix.h defs.h
 	g++ -o test5.test $(args) $(inc) $<
+test6.test: test6.cpp defs.h
+	g++ -o test6.test $(args) $(inc) $<
 .PHONY: cleanTest
 cleanTest:
 	rm -f *.test test*.o

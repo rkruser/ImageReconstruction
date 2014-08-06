@@ -37,7 +37,7 @@ class Matrix {
 
 		// Templated constructor for type conversion
 		template <class S>
-		explicit Matrix(const Matrix<S>&);
+		Matrix(const Matrix<S>&);
 
 		template <class S>
 		Matrix<T>& operator= (const Matrix<S>&);
@@ -82,12 +82,16 @@ class Matrix {
 
 		// Algebraic operators
 		void operator+=(const Matrix<T>&);
-		void operator+=(T);
+		template <class S>
+		void operator+=(S);
 		void operator*=(const Matrix<T>&);
-		void operator*=(T);
+		template <class S>
+		void operator*=(S);
 		void operator-=(const Matrix<T>&);
-		void operator-=(T);
-		void operator/=(T);
+		template <class S>
+		void operator-=(S);
+		template <class S>
+		void operator/=(S);
 			
 		//Note: Type T should be printable using << operator
 		void print(std::ostream&) const; 
@@ -109,8 +113,8 @@ template <class T>
 template <class S>
 void Matrix<T>::copy(const Matrix<S>& M) {
 	transpose = false;
-	rows = M.rows;
-	cols = M.cols;
+	rows = M.numRows(); //Because of type conversion copy constructors
+	cols = M.numCols();
 	array = new T[rows*cols];
 	for (size_t i = 0; i < rows*cols; i++) {
 		array[i] = M(i);
@@ -138,6 +142,7 @@ Matrix<T>::Matrix(const Matrix<T>& M) {
 }
 
 // Templated copy constructor
+// Apparently, if S != T then we don't have access to M's member variables!
 template <class T>
 template <class S>
 Matrix<T>::Matrix(const Matrix<S>& M) {
@@ -290,7 +295,8 @@ void Matrix<T>::operator+=(const Matrix<T>& M) {
 
 // Plus equals with a scalar
 template <class T>
-void Matrix<T>::operator+=(T a) {
+template <class S>
+void Matrix<T>::operator+=(S a) {
 	for (size_t i = 0; i < rows*cols; i++) {
 		(*this)(i) += a;
 	}
@@ -310,7 +316,8 @@ void Matrix<T>::operator-=(const Matrix<T>& M) {
 
 // Minus equals with scalar
 template <class T>
-void Matrix<T>::operator-=(T a) {
+template <class S>
+void Matrix<T>::operator-=(S a) {
 	for (size_t i = 0; i < rows*cols; i++) {
 		(*this)(i) -= a;
 	}
@@ -324,11 +331,45 @@ Matrix<T> operator+ (const Matrix<T>& A, const Matrix<T>& B) {
 	return C;
 }
 
+// Plus with left scalar
+template <class T, class S>
+Matrix<T> operator+ (S a, const Matrix<T>& B) {
+	Matrix<T> C(B);
+	C += a;
+	return C;
+}
+
+// Plus with right scalar
+template <class T, class S>
+Matrix<T> operator+ (const Matrix<T>& B, S a) {
+	Matrix<T> C(B);
+	C += a;
+	return C;
+}
+
 // Minus operator
 template <class T>
 Matrix<T> operator- (const Matrix<T>& A, const Matrix<T>& B) {
 	Matrix<T> C(A);
 	C -= B;
+	return C;
+}
+
+// Minus with left scalar
+template <class T, class S>
+Matrix<T> operator- (S a, const Matrix<T>& B) {
+	Matrix<T> C(B.numRows(),B.numCols());
+	for (size_t i = 0; i < B.numElts(); i++) {
+		C(i) = a-B(i);
+	}
+	return C;
+}
+
+// Minus with right scalar
+template <class T, class S>
+Matrix<T> operator- (const Matrix<T>& B, S a) {
+	Matrix<T> C(B);
+	C -= a;
 	return C;
 }
 
@@ -359,7 +400,8 @@ void Matrix<T>::operator*= (const Matrix<T>& M) {
 
 // Times equals with scalar
 template <class T>
-void Matrix<T>::operator*= (T a) {
+template <class S>
+void Matrix<T>::operator*= (S a) {
 	for (size_t i = 0; i < rows*cols; i++) {
 		(*this)(i) *= a;
 	}
@@ -367,12 +409,14 @@ void Matrix<T>::operator*= (T a) {
 
 // Divided by equals (necessarily with scalar)
 template <class T>
-void Matrix<T>::operator/= (T a) {
+template <class S>
+void Matrix<T>::operator/= (S a) {
 	/*
 	for (size_t i = 0; i < rows*cols; i++) {
 		(*this)(i) /= a;
 	}
 	*/
+	// Return to this
 	for (auto i = array; i != array + rows*cols; ) {
 		*i++ /= a;
 	}
@@ -387,38 +431,40 @@ Matrix<T> operator* (const Matrix<T>& A, const Matrix<T>& B) {
 }
 
 // Times with right scalar
-template <class T>
-Matrix<T> operator* (const Matrix<T>& A, T b) {
+template <class T, class S>
+Matrix<T> operator* (const Matrix<T>& A, S b) {
 	Matrix<T> C(A);
 	C *= b;
 	return C;
 }
 
 // Times with left scalar
-template <class T>
-Matrix<T> operator* (T a, const Matrix<T>& B) {
+template <class T, class S>
+Matrix<T> operator* (S a, const Matrix<T>& B) {
 	Matrix<T> C(B);
 	C *= a;
 	return C;
 }
 
 //Divided by with right scalar
-template <class T>
-Matrix<T> operator/ (const Matrix<T>& A, T b) {
+template <class T, class S>
+Matrix<T> operator/ (const Matrix<T>& A, S b) {
 	Matrix<T> C(A);
 	C /= b;
 	return C;
 }
 
 //Divided by with left scalar
-template <class T>
-Matrix<T> operator/ (T a, const Matrix<T>& B) {
+template <class T, class S>
+Matrix<T> operator/ (S a, const Matrix<T>& B) {
 	Matrix<T> C(B);
 	for (size_t i = 0; i < C.numElts(); i++) {
 		C(i) = a / C(i);
 	}
 	return C;
 }
+
+// Return to how T and S interact in above functions
 
 //***********************************************
 
