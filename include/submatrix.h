@@ -8,7 +8,6 @@ class size_mismatch{};
 template <class T>
 class Submatrix {
 	public:
-
 		Submatrix(Matrix<T>& mat) : M(mat) {};
 		~Submatrix() {
 		   	indices.~vector<size_t>();
@@ -123,24 +122,58 @@ void Submatrix<T>::operator*= (const S& mat) {
 	(*this) = newmat;
 }
 
-/*
-template <class T, class S, class U>
-static void add(Matrix<T>& mat, const S& larg, const U& rarg) {
-	for (size_t i = 0; i < larg.numRows(); i++) {
-		for (size_t j = 0; j < larg.numCols(); j++) {
-			mat(i,j) = larg(i,j) + rarg(i,j);
-		}
-	}
-}
-
-template <class T>
-Matrix<T> operator+ (const Submatrix<T>& A, const Submatrix<T>& B) {
-	Matrix<T> mat(A.numRows(),A.numCols(),0);
+// Wow, I'm absolutely amazed that the following worked
+// Requires that A and B have indexing capabilities
+// and numRows(), numCols() member functions
+template < template <typename> class S, template <typename> class Y, typename T>
+Matrix<T> operator+ (const S<T>& A, const Y<T>& B) {
 	if (A.numRows() != B.numRows() or A.numCols() != B.numCols()) {
 		size_mismatch error;
 		throw error;
 	}
-	add(mat, A, B);
-	return mat;
+
+	Matrix<T> result(A.numRows(), A.numCols());
+	for (size_t i = 0; i < A.numRows(); i++) {
+		for (size_t j = 0; j < A.numCols(); j++) {
+			result(i,j) = A(i,j) + B(i,j);
+		}
+	}
+
+	return result;
 }
-*/
+
+template < template <typename> class S, template <typename> class Y, typename T>
+Matrix<T> operator- (const S<T>& A, const Y<T>& B) {
+	if (A.numRows() != B.numRows() or A.numCols() != B.numCols()) {
+		size_mismatch error;
+		throw error;
+	}
+
+	Matrix<T> result(A.numRows(), A.numCols());
+	for (size_t i = 0; i < A.numRows(); i++) {
+		for (size_t j = 0; j < A.numCols(); j++) {
+			result(i,j) = A(i,j) - B(i,j);
+		}
+	}
+
+	return result;
+}
+
+template < template <typename> class S, template <typename> class Y, typename T>
+Matrix<T> operator* (const S<T>& A, const Y<T>& B) {
+	if (A.numCols() != B.numRows()) {
+		size_mismatch error;
+		throw error;
+	}
+
+	Matrix<T> result(A.numRows(), B.numCols(),0);
+	for (size_t i = 0; i < A.numRows(); i++) {
+		for (size_t j = 0; j < B.numCols(); j++) {
+			for (size_t k = 0; k < A.numCols(); k++) {
+				result(i,j) += A(i,k)*B(k,j);
+			}
+		}
+	}
+
+	return result;
+}

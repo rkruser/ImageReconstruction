@@ -230,6 +230,7 @@ void Matrix<T>::operator-=(const Matrix<T>& M) {
 	}
 }
 
+/*
 template <class T>
 Matrix<T> operator+ (const Matrix<T>& A, const Matrix<T>& B) {
 	Matrix<T> C(A);
@@ -243,6 +244,7 @@ Matrix<T> operator- (const Matrix<T>& A, const Matrix<T>& B) {
 	C -= B;
 	return C;
 }
+*/
 
 // Possibly change this
 // Makes transposition difficult, maybe
