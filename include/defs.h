@@ -34,6 +34,13 @@ class Matrix {
 		Matrix<T>& operator= (Matrix<T>&&); //Move assignment
 		~Matrix();
 
+		// Templated constructor for type conversion
+		template <class S>
+		Matrix(const Matrix<S>&);
+
+		template <class S>
+		Matrix<T>& operator= (const Matrix<S>&);
+
 		// Array size data
 		size_t numElts() const { return rows*cols;}
 		size_t numRows() const { return rows;}
@@ -68,9 +75,11 @@ class Matrix {
 		const T& nAccess(size_t i, size_t j) const { return array[i*cols+j]; }
 		const T& nAccess(size_t i) const { return array[i]; }
 
+		// Transposition
 		void deepTranspose();
 		void shallowTranspose();
 
+		// Algebraic operators
 		void operator+=(const Matrix<T>&);
 		void operator+=(T);
 		void operator*=(const Matrix<T>&);
@@ -127,6 +136,13 @@ Matrix<T>::Matrix(const Matrix<T>& M) {
 	copy(M);
 }
 
+// Templated copy constructor
+template <class T>
+template <class S>
+Matrix<T>::Matrix(const Matrix<S>& M) {
+	copy(M);
+}
+
 // Constructor allocating dimensions
 template <class T>
 Matrix<T>::Matrix(size_t a, size_t b) {
@@ -157,6 +173,16 @@ Matrix<T>& Matrix<T>::operator= (const Matrix<T>& M) {
 	return *this;
 }
 
+// Templated Assignment
+template <class T>
+template <class S>
+Matrix<T>& Matrix<T>::operator= (const Matrix<S>& M) {
+	if (this != &M) {
+		delete[] array;
+		copy(M);
+	}
+	return *this;
+}
 
 // Move copy 
 template <class T>
