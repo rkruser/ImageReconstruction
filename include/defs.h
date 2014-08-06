@@ -19,6 +19,7 @@ struct RGB {
 
 //***************************************************************
 //Matrix class
+// Still need to test the scalar operators
 template <class T>
 class Matrix {
 	public:
@@ -36,7 +37,7 @@ class Matrix {
 
 		// Templated constructor for type conversion
 		template <class S>
-		Matrix(const Matrix<S>&);
+		explicit Matrix(const Matrix<S>&);
 
 		template <class S>
 		Matrix<T>& operator= (const Matrix<S>&);
