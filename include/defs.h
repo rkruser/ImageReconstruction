@@ -5,6 +5,7 @@
 #include <iostream>
 #include <iomanip>
 #include <utility>
+#include <typeinfo>
 using std::size_t; //The only reason for including cstdlib
 
 #define NAN std::numeric_limits<double>::quiet_NaN();
@@ -28,7 +29,7 @@ class Matrix {
 		Matrix(size_t, size_t, T);
 		
 		template <class S>
-		Matrix(const Matrix<S>&);
+		explicit Matrix(const Matrix<S>&);
 
 		template <class S>
 		Matrix<T>& operator= (const Matrix<S>&);
@@ -41,9 +42,12 @@ class Matrix {
 
 		~Matrix();
 
+		// Array size data
 		size_t numElts() const { return rows*cols;}
 		size_t numRows() const { return rows;}
 		size_t numCols() const { return cols;}
+		
+		// Access operators
 		T& operator() (size_t i) { 
 			if (transpose) return array[(i%cols)*rows+i/cols];
 			else return array[i];
@@ -76,8 +80,12 @@ class Matrix {
 		void shallowTranspose();
 
 		void operator+=(const Matrix<T>&);
+		void operator+=(T);
 		void operator*=(const Matrix<T>&);
+		void operator*=(T);
 		void operator-=(const Matrix<T>&);
+		void operator-=(T);
+		void operator/=(T);
 			
 		//Note: Type T should be printable using << operator
 		void print(std::ostream&) const; 
@@ -94,6 +102,7 @@ class Matrix {
 		void copy(const Matrix<S>&);
 };
 
+//Private member function for utility
 template <class T>
 template <class S>
 void Matrix<T>::copy(const Matrix<S>& M) {
@@ -102,10 +111,15 @@ void Matrix<T>::copy(const Matrix<S>& M) {
 	cols = M.cols;
 	array = new T[rows*cols];
 	for (size_t i = 0; i < rows*cols; i++) {
-		array[i] = M(i); //Effectively makes deep transpose of M
+		array[i] = M(i);
 	}
 }
 
+/****
+ * Constructors, copy constructors, assignment operators, destructor
+ ****/
+
+// Default constructor
 template <class T>
 Matrix<T>::Matrix() : 
 	array(nullptr),
@@ -114,12 +128,14 @@ Matrix<T>::Matrix() :
 	cols(0)
 	{}
 
+// Copy constructor
 template <class T>
 template <class S>
 Matrix<T>::Matrix(const Matrix<S>& M) {
 	copy(M);
 }
 
+// Constructor allocating dimensions
 template <class T>
 Matrix<T>::Matrix(size_t a, size_t b) {
 	rows = a;
@@ -128,7 +144,7 @@ Matrix<T>::Matrix(size_t a, size_t b) {
 	transpose = false;
 }
 
-
+// Constructor allocating dimensions and initializing to a value
 template <class T>
 Matrix<T>::Matrix(size_t r, size_t c, T fill) :
 	transpose(false),
@@ -139,34 +155,7 @@ Matrix<T>::Matrix(size_t r, size_t c, T fill) :
 		for (size_t i = 0; i < r*c; i++) array[i] = fill;
 }
 
-template <class T>
-template <class S>
-Matrix<T>::Matrix(Matrix<S>&& M) {
-	array = M.array;
-	rows = M.rows;
-	cols = M.cols;
-	transpose = M.transpose;
-
-	M.array = nullptr;
-	M.rows = M.cols = 0;
-}
-
-template <class T>
-template <class S>
-Matrix<T>& Matrix<T>::operator= (Matrix<S>&& M) {
-	if (this != &M) {
-		delete[] array;
-		array = M.array;
-		rows = M.rows;
-		cols = M.cols;
-		transpose = M.transpose;
-
-		M.array = nullptr;
-		M.rows = M.cols = 0;
-	}
-	return *this;
-}
-
+// Standard Assignment operator
 template <class T>
 template <class S>
 Matrix<T>& Matrix<T>::operator= (const Matrix<S>& M) {
@@ -177,11 +166,60 @@ Matrix<T>& Matrix<T>::operator= (const Matrix<S>& M) {
 	return *this;
 }
 
+
+// Move copy 
+template <class T>
+template <class S>
+Matrix<T>::Matrix(Matrix<S>&& M) {
+	if (typeid(S) == typeid(T)) {
+		array = M.array;
+		rows = M.rows;
+		cols = M.cols;
+		transpose = M.transpose;
+	}
+	else {
+		copy(M);
+		delete[] M.array;
+	}
+	M.array = nullptr;
+	M.rows = M.cols = 0;
+}
+
+// Move assignment
+template <class T>
+template <class S>
+Matrix<T>& Matrix<T>::operator= (Matrix<S>&& M) {
+	if (this != &M) {
+		delete[] array;
+		if (typeid(T) == typeid(S)) {
+			array = M.array;
+			rows = M.rows;
+			cols = M.cols;
+			transpose = M.transpose;
+		}
+		else {
+			copy(M);
+			delete[] M.array;
+		}
+
+		M.array = nullptr;
+		M.rows = M.cols = 0;
+	}
+	return *this;
+}
+
+
+// Destructor
 template <class T>
 Matrix<T>::~Matrix() {
 	delete[] array;
 }
 
+/****
+ * Transposition
+ ****/
+
+// Deep transpose: reorder data in memory
 template <class T>
 void Matrix<T>::deepTranspose() {
 	shallowTranspose();
@@ -191,12 +229,18 @@ void Matrix<T>::deepTranspose() {
 	}
 }
 
+// Shallow transpose: access in different order
 template <class T>
 void Matrix<T>::shallowTranspose() {
 	transpose = !transpose;
 	std::swap(rows,cols);
 }
 
+/****
+ * Functions for printing matrices
+ ****/
+
+// Pretty print
 template <class T>
 void Matrix<T>::print(std::ostream& out) const {
 	for (size_t i = 0; i < rows; i++) {
@@ -207,6 +251,7 @@ void Matrix<T>::print(std::ostream& out) const {
 	}	
 }
 
+// File write
 template <class T>
 void Matrix<T>::write(std::ostream& out) const {
 	out << rows << '\n' << cols << '\n';
@@ -215,15 +260,18 @@ void Matrix<T>::write(std::ostream& out) const {
 	}
 }
 
+/****
+ * Operators on Matrices
+ ****/
 
-// Nonmember function, overloading output
+// Output operator
 template <class T>
 std::ostream& operator<< (std::ostream& out, Matrix<T> M) {
 	M.print(out);
 	return out;
 }
 
-// These will need to be changed in event of tranpose
+// Plus equals
 template <class T>
 void Matrix<T>::operator+=(const Matrix<T>& M) {
 	if (M.rows != rows or M.cols != cols) {
@@ -235,6 +283,15 @@ void Matrix<T>::operator+=(const Matrix<T>& M) {
 	}
 }
 
+// Plus equals with a scalar
+template <class T>
+void Matrix<T>::operator+=(T a) {
+	for (size_t i = 0; i < rows*cols; i++) {
+		(*this)(i) += a;
+	}
+}
+
+// Minus equals
 template <class T>
 void Matrix<T>::operator-=(const Matrix<T>& M) {
 	if (M.rows != rows or M.cols != cols) {
@@ -246,7 +303,15 @@ void Matrix<T>::operator-=(const Matrix<T>& M) {
 	}
 }
 
+// Minus equals with scalar
+template <class T>
+void Matrix<T>::operator-=(T a) {
+	for (size_t i = 0; i < rows*cols; i++) {
+		(*this)(i) -= a;
+	}
+}
 
+// Plus operator
 template <class T>
 Matrix<T> operator+ (const Matrix<T>& A, const Matrix<T>& B) {
 	Matrix<T> C(A);
@@ -254,6 +319,7 @@ Matrix<T> operator+ (const Matrix<T>& A, const Matrix<T>& B) {
 	return C;
 }
 
+// Minus operator
 template <class T>
 Matrix<T> operator- (const Matrix<T>& A, const Matrix<T>& B) {
 	Matrix<T> C(A);
@@ -261,8 +327,7 @@ Matrix<T> operator- (const Matrix<T>& A, const Matrix<T>& B) {
 	return C;
 }
 
-// Possibly change this
-// Makes transposition difficult, maybe
+// Times equals
 template <class T>
 void Matrix<T>::operator*= (const Matrix<T>& M) {
 	if (cols != M.rows) {
@@ -287,6 +352,28 @@ void Matrix<T>::operator*= (const Matrix<T>& M) {
 	transpose = false;
 }
 
+// Times equals with scalar
+template <class T>
+void Matrix<T>::operator*= (T a) {
+	for (size_t i = 0; i < rows*cols; i++) {
+		(*this)(i) *= a;
+	}
+}
+
+// Divided by equals (necessarily with scalar)
+template <class T>
+void Matrix<T>::operator/= (T a) {
+	/*
+	for (size_t i = 0; i < rows*cols; i++) {
+		(*this)(i) /= a;
+	}
+	*/
+	for (auto i = array; i != array + rows*cols; ) {
+		*i++ /= a;
+	}
+}
+
+// Times
 template <class T>
 Matrix<T> operator* (const Matrix<T>& A, const Matrix<T>& B) {
 	Matrix<T> C(A);
@@ -294,35 +381,33 @@ Matrix<T> operator* (const Matrix<T>& A, const Matrix<T>& B) {
 	return C;
 }
 
+// Times with right scalar
 template <class T>
-Matrix<T> operator* (const Matrix<T>& A, double b) {
+Matrix<T> operator* (const Matrix<T>& A, T b) {
 	Matrix<T> C(A);
-	for (size_t i = 0; i < C.numElts(); i++) {
-		C(i) *= b;
-	}
+	C *= b;
 	return C;
 }
 
+// Times with left scalar
 template <class T>
-Matrix<T> operator* (double a, const Matrix<T>& B) {
+Matrix<T> operator* (T a, const Matrix<T>& B) {
 	Matrix<T> C(B);
-	for (size_t i = 0; i < C.numElts(); i++) {
-		C(i) *= a;
-	}
+	C *= a;
 	return C;
 }
 
+//Divided by with right scalar
 template <class T>
-Matrix<T> operator/ (const Matrix<T>& A, double b) {
+Matrix<T> operator/ (const Matrix<T>& A, T b) {
 	Matrix<T> C(A);
-	for (size_t i = 0; i < C.numElts(); i++) {
-		C(i) /= b;
-	}
+	C /= b;
 	return C;
 }
 
+//Divided by with left scalar
 template <class T>
-Matrix<T> operator/ (double a, const Matrix<T>& B) {
+Matrix<T> operator/ (T a, const Matrix<T>& B) {
 	Matrix<T> C(B);
 	for (size_t i = 0; i < C.numElts(); i++) {
 		C(i) = a / C(i);
