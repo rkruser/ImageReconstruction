@@ -1,5 +1,6 @@
 #include "submatrix.h"
 #include "defs.h"
+#include <vector>
 
 #include <iostream>
 using namespace std;
@@ -9,9 +10,10 @@ int main() {
 	for (size_t i = 0; i < M.numElts(); i++) {
 		M(i) = i;
 	}
-	Submatrix<double> S(M);
-	S.pushIndex(0);
-	S.pushIndex(3);
+	std::vector<size_t> indices;
+	indices.push_back(0);
+	indices.push_back(3);
+	Submatrix<double> S(M, indices);
 	cout << M << '\n' << S << '\n';
 	S(1,2) = -4;
 	cout << M << '\n' << S << '\n';

@@ -94,6 +94,13 @@ class Matrix {
 		void operator-=(S);
 		template <class S>
 		void operator/=(S);
+
+		void scale(double factor) {
+			for (size_t i = 0; i < numElts(); i++) {
+				array[i] *= factor;
+			}
+		}
+				
 			
 		//Note: Type T should be printable using << operator
 		void print(std::ostream&, int, int) const; 
@@ -327,6 +334,7 @@ void Matrix<T>::operator-=(S a) {
 	}
 }
 
+/*
 // Plus operator
 template <class T>
 Matrix<T> operator+ (const Matrix<T>& A, const Matrix<T>& B) {
@@ -334,6 +342,7 @@ Matrix<T> operator+ (const Matrix<T>& A, const Matrix<T>& B) {
 	C += B;
 	return C;
 }
+
 
 // Plus with left scalar
 template <class T, class S>
@@ -376,6 +385,7 @@ Matrix<T> operator- (const Matrix<T>& B, S a) {
 	C -= a;
 	return C;
 }
+*/
 
 // Times equals
 template <class T>
@@ -426,6 +436,7 @@ void Matrix<T>::operator/= (S a) {
 	}
 }
 
+/*
 // Times
 template <class T>
 Matrix<T> operator* (const Matrix<T>& A, const Matrix<T>& B) {
@@ -449,6 +460,7 @@ Matrix<T> operator* (S a, const Matrix<T>& B) {
 	C *= a;
 	return C;
 }
+*/
 
 //Divided by with right scalar
 template <class T, class S>

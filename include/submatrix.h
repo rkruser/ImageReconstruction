@@ -10,17 +10,12 @@ class size_mismatch{};
 template <class T>
 class Submatrix {
 	public:
-		Submatrix(Matrix<T>& mat) : M(mat) {};
 		Submatrix(Matrix<T>& mat, const std::vector<size_t>& v) : 
 			M(mat), 
 			indices(v) {};
 		Submatrix(Matrix<T>& mat, const Submatrix<T>& s) :
 			M(mat),
 			indices(s.indices) {};
-
-		void pushIndex(size_t i) {
-			indices.push_back(i);
-		}
 
 		T& operator() (size_t i, size_t j) {
 			return M(indices[i], j);
@@ -61,7 +56,7 @@ class Submatrix {
 
 	private:
 		Matrix<T>& M;
-		std::vector<size_t> indices;
+		const std::vector<size_t>& indices;
 };
 
 template <class T>

@@ -4,10 +4,8 @@
 //#include <cstdlib>
 #include <random>
 
-template <class U>
-Matrix<U> identity(U size) {
-	size_t intSize = size_t(size);
-	Matrix<U> I(intSize,intSize,0);
+Matrix<double> identity(size_t size) {
+	Matrix<double> I(size,size,0);
 	for (size_t i = 0; i < size; i++) {
 		I(i,i) = 1;
 	}
