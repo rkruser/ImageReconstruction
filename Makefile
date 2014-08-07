@@ -5,7 +5,7 @@ VPATH = src:include:images:test #Directories searched by make
 args = -g -std=c++11 -Wall -Wextra -pedantic -Wvla 
 optimize: args = -O3 -std=c++11
 # -funroll in optimize?
-obj = main.o read.o naivenn.o makeSparse.o
+obj = main.o read.o naivenn.o makeSparse.o ALS.o
 inc = -Iimages -Iinclude
 
 # Main targets
@@ -44,6 +44,8 @@ naivenn.o: naivenn.cpp naivenn.h defs.h
 	g++ -c $(inc) $(args) $<
 makeSparse.o: makeSparse.cpp defs.h makeSparse.h 
 	g++ -c $(inc) $(args) $<
+ALS.o: ALS.cpp ALS.h defs.h submatrix.h creation.h sor.h
+	g++ -c $(inc) $(arg) $<
 
 # Clean results of main targets
 .PHONY: clean
