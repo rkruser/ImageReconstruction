@@ -81,6 +81,8 @@ class Matrix {
 		void shallowTranspose();
 
 		// Algebraic operators
+		// Note: does not interact well with submatrix yet
+		// Cannot use +=, *=, -= with submatrix yet
 		void operator+=(const Matrix<T>&);
 		template <class S>
 		void operator+=(S);
@@ -94,7 +96,7 @@ class Matrix {
 		void operator/=(S);
 			
 		//Note: Type T should be printable using << operator
-		void print(std::ostream&) const; 
+		void print(std::ostream&, int, int) const; 
 		void write(std::ostream&) const; //For writing to files
 
 
@@ -252,10 +254,12 @@ void Matrix<T>::shallowTranspose() {
 
 // Pretty print
 template <class T>
-void Matrix<T>::print(std::ostream& out) const {
+void Matrix<T>::print(std::ostream& out, int precision = 4, 
+		int width = 5) const {
 	for (size_t i = 0; i < rows; i++) {
 		for (size_t j = 0; j < cols; j++) {
-			out << std::setprecision(4) << std::setw(5) << (*this)(i,j);
+			out << std::setprecision(precision) 
+				<< std::setw(width) << (*this)(i,j);
 		}
 		out << '\n';
 	}	
@@ -466,17 +470,6 @@ Matrix<T> operator/ (S a, const Matrix<T>& B) {
 
 // Return to how T and S interact in above functions
 
-//***********************************************
-
-template <class U>
-Matrix<U> identity(U size) {
-	size_t intSize = size_t(size);
-	Matrix<U> I(intSize,intSize,0);
-	for (size_t i = 0; i < size; i++) {
-		I(i,i) = 1;
-	}
-	return I;
-}
 
 //************************************************
 
