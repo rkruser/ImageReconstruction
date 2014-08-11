@@ -2,6 +2,7 @@
 #include "creation.h"
 #include "submatrix.h"
 #include "sor.h"
+#include "column.h"
 
 #include <vector>
 #include <utility>

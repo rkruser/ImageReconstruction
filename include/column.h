@@ -5,48 +5,50 @@
 #include <vector>
 
 
-class size_mismatch{};
-
 template <class T>
-class Submatrix {
+class Column {
 	public:
-		Submatrix(Matrix<T>& mat, const std::vector<size_t>& v) : 
+		class size_mismatch{};
+
+		Column(Matrix<T>& mat, const std::vector<size_t>& v, size_t col) :
 			M(mat), 
-			indices(v) {};
-		Submatrix(Matrix<T>& mat, const Submatrix<T>& s) :
+			indices(v),
+   			column(col)	{};
+		Column(Matrix<T>& mat, const Column<T>& s) :
 			M(mat),
-			indices(s.indices) {};
+			indices(s.indices) 
+			column(s.column) {};
 
 		T& operator() (size_t i, size_t j) {
-			return M(indices[i], j);
+			return M(indices[i], column);
 		}
 		const T& operator() (size_t i, size_t j) const {
-			return M(indices[i], j);
+			return M(indices[i], column);
 		}
 		T& operator() (size_t i) {
-			return M(indices[i/numCols()], i%numCols());
+			return M(indices[i], column);
 		}
 		const T& operator() (size_t i) const {
-			return M(indices[i/numCols()], i%numCols());
+			return M(indices[i], column);
 		}	
 
-		T& tAccess(size_t i) { return M(indices[i%numRows()], i/numRows()); }
-		const T& tAccess(size_t i) const { return M(indices[i%numRows()], i/numRows());}
-		T& tAccess(size_t i, size_t j) { return M(indices[j],i); }
-		const T& tAccess(size_t i, size_t j) const { return M(indices[j],i); }
+		T& tAccess(size_t i) { return M(indices[i], column); }
+		const T& tAccess(size_t i) const { return M(indices[i], column);}
+		T& tAccess(size_t i, size_t j) { return M(indices[i],column); }
+		const T& tAccess(size_t i, size_t j) const { return M(indices[i],column); }
 
 		size_t numRows() const {
 			return indices.size();
 		}
 		size_t numCols() const {
-			return M.numCols();
+			return 1;
 		}
 		size_t numElts() const {
-			return indices.size()*M.numCols();
+			return indices.size();
 		}
 
 		template <class S>
-		Submatrix<T>& operator= (const S&);
+		Column<T>& operator= (const S&);
 		
 		template <class S>
 		void operator+= (const S&);
@@ -63,10 +65,11 @@ class Submatrix {
 	private:
 		Matrix<T>& M;
 		const std::vector<size_t>& indices;
+		size_t column
 };
 
 template <class T>
-void Submatrix<T>::print(std::ostream& out) {
+void Column<T>::print(std::ostream& out) {
 	for (size_t i = 0; i < numRows(); i++) {
 		for (size_t j = 0; j < numCols(); j++) {
 			out << std::setw(5) << (*this)(i,j);
@@ -76,7 +79,7 @@ void Submatrix<T>::print(std::ostream& out) {
 }
 
 template <class T>
-void Submatrix<T>::write(std::ostream& out) {
+void Column<T>::write(std::ostream& out) {
 	out << numRows() << '\n' << numCols() << '\n';
 	for (size_t i = 0; i < numRows()*numCols(); i++) {
 		out << (*this)(i) << '\n';
@@ -84,14 +87,14 @@ void Submatrix<T>::write(std::ostream& out) {
 }
 
 template <class T>
-std::ostream& operator<< (std::ostream& out, Submatrix<T> S) {
+std::ostream& operator<< (std::ostream& out, Column<T> S) {
 	S.print(out);
 	return out;
 }
 
 template <class T>
 template <class S>
-Submatrix<T>& Submatrix<T>::operator= (const S& mat) {
+Column<T>& Column<T>::operator= (const S& mat) {
 	if (mat.numRows() != numRows() or mat.numCols() != numCols()) {
 		size_mismatch error;
 		throw error;
@@ -108,7 +111,7 @@ Submatrix<T>& Submatrix<T>::operator= (const S& mat) {
 
 template <class T>
 template <class S>
-void Submatrix<T>::operator+= (const S& mat) {
+void Column<T>::operator+= (const S& mat) {
 	if (mat.numRows() != numRows() or mat.numCols() != numCols()) {
 		size_mismatch error;
 		throw error;
@@ -123,7 +126,7 @@ void Submatrix<T>::operator+= (const S& mat) {
 
 template <class T>
 template <class S>
-void Submatrix<T>::operator-= (const S& mat) {
+void Column<T>::operator-= (const S& mat) {
 	if (mat.numRows() != numRows() or mat.numCols() != numCols()) {
 		size_mismatch error;
 		throw error;
@@ -138,7 +141,7 @@ void Submatrix<T>::operator-= (const S& mat) {
 
 template <class T>
 template <class S>
-void Submatrix<T>::operator*= (const S& mat) {
+void Column<T>::operator*= (const S& mat) {
 	if (numCols() != mat.numRows() or numCols() != mat.numCols()) {
 		size_mismatch error;
 		throw error;
@@ -155,13 +158,14 @@ void Submatrix<T>::operator*= (const S& mat) {
 	(*this) = newmat;
 }
 
+/*
 // Wow, I'm absolutely amazed that the following worked
 // Requires that A and B have indexing capabilities
 // and numRows(), numCols() member functions
 template < template <typename> class S, template <typename> class Y, typename T>
 Matrix<T> operator+ (const S<T>& A, const Y<T>& B) {
 	if (A.numRows() != B.numRows() or A.numCols() != B.numCols()) {
-		size_mismatch error;
+		Column::size_mismatch error;
 		throw error;
 	}
 
@@ -178,7 +182,7 @@ Matrix<T> operator+ (const S<T>& A, const Y<T>& B) {
 template < template <typename> class S, template <typename> class Y, typename T>
 Matrix<T> operator- (const S<T>& A, const Y<T>& B) {
 	if (A.numRows() != B.numRows() or A.numCols() != B.numCols()) {
-		size_mismatch error;
+		Column::size_mismatch error;
 		throw error;
 	}
 
@@ -195,7 +199,7 @@ Matrix<T> operator- (const S<T>& A, const Y<T>& B) {
 template < template <typename> class S, template <typename> class Y, typename T>
 Matrix<T> operator* (const S<T>& A, const Y<T>& B) {
 	if (A.numCols() != B.numRows()) {
-		size_mismatch error;
+		Column::size_mismatch error;
 		throw error;
 	}
 
@@ -210,3 +214,4 @@ Matrix<T> operator* (const S<T>& A, const Y<T>& B) {
 
 	return result;
 }
+*/

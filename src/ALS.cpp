@@ -79,8 +79,8 @@ Matrix<double> ALS(Matrix<double> M, int features, double lambda, int maxIter) {
 
 		for (size_t i = 0; i < n; i++) {
 			if (selectors[i].size() > 0) {
-				Submatrix<double> A(M, selectors[i]); //This submatrix is too big!
-				Submatrix<double> B(U, selectors[i]);
+				Submatrix<double> A(U, selectors[i]);
+				Column<double> B(M, selectors[i], i);
 				Matrix<double> left = selfProduct(A);
 				diagonalAdd(left,lambda);
 				Matrix<double> right = transProduct(A,B);
