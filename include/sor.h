@@ -23,8 +23,8 @@ double norm(const Mat& x) {
 // convergence is the value we tolerate 
 // Function is templated to accomodate different matrix types
 // 	that have the same operators.
-template <class Mat> 
-void SOR(const Mat& A, const Mat& B, Mat& x, double w, double convergence) {
+template <class Mat1, class Mat2, class Mat3> 
+void SOR(const Mat1& A, const Mat2& B, Mat3& x, double w, double convergence) {
 	class not_square {};
 	class not_column_vector{};
 	class size_mismatch{};

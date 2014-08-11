@@ -1,5 +1,6 @@
 #include "sor.h"
 #include "defs.h"
+#include "submatrix.h"
 
 #include <iostream>
 using namespace std;
