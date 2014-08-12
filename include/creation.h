@@ -6,7 +6,7 @@
 
 //#include <cstdlib>
 #include <random>
-
+/*
 Matrix<double> identity(size_t size) {
 	Matrix<double> I(size,size,0);
 	for (size_t i = 0; i < size; i++) {
@@ -24,5 +24,6 @@ Matrix<double> randMat(size_t rows, size_t cols) {
 	}
 	return mat;
 }
+*/
 
 #endif

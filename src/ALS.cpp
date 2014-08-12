@@ -1,7 +1,18 @@
 #include "ALS.h"
+#include <random>
 
 const double w = 1.1;
 const double convergence = 0.01;
+
+Matrix<double> randMat(size_t rows, size_t cols) {
+	Matrix<double> mat(rows,cols);
+	std::uniform_real_distribution<> randNums;
+	std::minstd_rand generator(1);
+	for (size_t k = 0; k < mat.numElts(); k++) {
+		mat(k) = randNums(generator);
+	}
+	return mat;
+}
 
 // Returns A^t*A 
 template <class S>
