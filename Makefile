@@ -3,8 +3,8 @@ include config.mk
 
 VPATH = src:include:images:test #Directories searched by make
 args = -g -std=c++11 -Wall -Wextra -pedantic -Wvla 
-optimize: args = -O3 -std=c++11
-# -funroll in optimize?
+optimize: args = -O3 -std=c++11 -funroll-loops
+# -funroll-loops in optimize?
 obj = main.o read.o naivenn.o makeSparse.o ALS.o
 inc = -Iimages -Iinclude
 

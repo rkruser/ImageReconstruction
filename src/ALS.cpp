@@ -1,8 +1,11 @@
 #include "ALS.h"
 #include <random>
+#include <cassert>
+#include <iostream>
+using std::cout;
 
 const double w = 1.1;
-const double convergence = 0.01;
+const double convergence = 0.0001;
 
 Matrix<double> randMat(size_t rows, size_t cols) {
 	Matrix<double> mat(rows,cols);
@@ -93,6 +96,7 @@ Matrix<double> ALS(Matrix<double>& M, int features, double lambda, int maxIter) 
 	// Perhaps modify the objects so as to efficiently undergo mitosis
 
 	while (numIter < maxIter) {
+		cout << "Loop " << numIter << '\n';
 		for (size_t i = 0; i < n; i++) {
 			if (selectors[i].size() > 0) {
 				Submatrix<double> A(U, selectors[i]);
@@ -101,7 +105,7 @@ Matrix<double> ALS(Matrix<double>& M, int features, double lambda, int maxIter) 
 				diagonalAdd(left,lambda);
 				Matrix<double> right = transProduct(A,B);
 				Column<double> X(V, fullFeatureCol, i);
-				SOR(A, B, X, w, convergence);
+				SOR(left, right, X, w, convergence);
 			}
 		}
 		U.shallowTranspose();
@@ -114,7 +118,7 @@ Matrix<double> ALS(Matrix<double>& M, int features, double lambda, int maxIter) 
 				diagonalAdd(left,lambda);
 				Matrix<double> right = transProduct(A,B);
 				Column<double> X(U, fullFeatureCol, j);
-				SOR(A,B,X,w,convergence);
+				SOR(left,right,X,w,convergence);
 			}
 		}
 		U.shallowTranspose();

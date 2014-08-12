@@ -42,32 +42,38 @@ int main(){
 	// Problem: for some reason, the online xpm file converter only retains 256 colors,
 	// diminishing image quality for color images
 	Image sparseImage(M);
-	makeSparse(sparseImage.R, 0.7);
+	makeSparse(sparseImage.R, 0.4);
 	if (sparseImage.color) {
-		makeSparse(sparseImage.G, 0.7);
-		makeSparse(sparseImage.B, 0.7);
+		makeSparse(sparseImage.G, 0.4);
+		makeSparse(sparseImage.B, 0.4);
 	}
 
-	Matrix<double> svdRecon = ALS(sparseImage.R, 20, 0.05, 30);
+	Matrix<double> svdRecon = ALS(sparseImage.R, 25, 0.05, 30);
+	Image svdRepair;
+	svdRepair.R = svdRecon;
 
 	/*
-	Image naiveRepair(sparseImage);
+	Image naiveRepair(sparseImage); 
 	naivenn(naiveRepair.R, 16);
 	if (naiveRepair.color) {
 		naivenn(naiveRepair.G, 16);
 		naivenn(naiveRepair.B, 16);
 	}
+	*/
 
+	
 	std::ofstream f1, f2, f3;
 	f1.open("./output/original.txt");
 	f2.open("./output/sparse.txt");
-	f3.open("./output/naiveRecon.txt");
+	//f3.open("./output/naiveRecon.txt");
+	f3.open("./output/svdRecon.txt");
 	printImage(f1, M);
 	printImage(f2, sparseImage);
-	printImage(f3, naiveRepair);
+	//printImage(f3, naiveRepair);
+	printImage(f3, svdRepair);
 	f1.close();
 	f2.close();
-	f3.close(); */
+	f3.close(); 
 	timer = std::clock()-timer;
 	std::cout << "Time elapsed: " << double(timer)/CLOCKS_PER_SEC << '\n';
 	
