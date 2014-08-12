@@ -1,3 +1,6 @@
+#ifndef COLUMN_H
+#define COLUMN_H
+
 #include "defs.h"
 
 #include <ostream>
@@ -16,7 +19,7 @@ class Column {
    			column(col)	{};
 		Column(Matrix<T>& mat, const Column<T>& s) :
 			M(mat),
-			indices(s.indices) 
+			indices(s.indices),
 			column(s.column) {};
 
 		T& operator() (size_t i, size_t j) {
@@ -65,7 +68,7 @@ class Column {
 	private:
 		Matrix<T>& M;
 		const std::vector<size_t>& indices;
-		size_t column
+		size_t column;
 };
 
 template <class T>
@@ -215,3 +218,5 @@ Matrix<T> operator* (const S<T>& A, const Y<T>& B) {
 	return result;
 }
 */
+
+#endif

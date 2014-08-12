@@ -2,6 +2,9 @@
 #define SOR_H
 
 #include "defs.h"
+#include "submatrix.h"
+#include "column.h"
+#include "creation.h"
 #include <iostream>
 #include <cmath>
 using std::cout;

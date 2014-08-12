@@ -9,6 +9,7 @@
 #define COLORED false
 
 #include "defs.h"
+#include "ALS.h"
 #include "read.h"
 #include "naivenn.h"
 #include "makeSparse.h"
@@ -47,6 +48,9 @@ int main(){
 		makeSparse(sparseImage.B, 0.7);
 	}
 
+	Matrix<double> svdRecon = ALS(sparseImage.R, 20, 0.05, 30);
+
+	/*
 	Image naiveRepair(sparseImage);
 	naivenn(naiveRepair.R, 16);
 	if (naiveRepair.color) {
@@ -63,7 +67,7 @@ int main(){
 	printImage(f3, naiveRepair);
 	f1.close();
 	f2.close();
-	f3.close();
+	f3.close(); */
 	timer = std::clock()-timer;
 	std::cout << "Time elapsed: " << double(timer)/CLOCKS_PER_SEC << '\n';
 	

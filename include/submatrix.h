@@ -1,3 +1,6 @@
+#ifndef SUBMATRIX_H
+#define SUBMATRIX_H
+
 #include "defs.h"
 
 #include <ostream>
@@ -210,3 +213,5 @@ Matrix<T> operator* (const S<T>& A, const Y<T>& B) {
 
 	return result;
 }
+
+#endif

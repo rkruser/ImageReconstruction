@@ -30,6 +30,8 @@ test6.test: test6.cpp defs.h creation.h
 	g++ -o test6.test $(args) $(inc) $<
 test9.test: test9.cpp defs.h submatrix.h column.h
 	g++ -o test9.test $(args) $(inc) $<
+ALStest.test: ALStest.cpp ALS.h sor.h
+	g++ -o ALStest.test $(args) $(inc) $<
 
 .PHONY: cleanTest
 cleanTest:
@@ -39,7 +41,7 @@ cleanTest:
 main.exe: $(obj)
 	g++ -o main.exe $(inc) $(args) $^
 #  $^ lists all the prerequisites
-main.o: main.cpp defs.h read.h naivenn.h makeSparse.h
+main.o: main.cpp defs.h read.h naivenn.h makeSparse.h ALS.h
 	g++ -c $(inc) $(args) $<
 read.o: read.cpp read.h defs.h 
 	g++ -c $(inc) $(args) $<
@@ -47,8 +49,8 @@ naivenn.o: naivenn.cpp naivenn.h defs.h
 	g++ -c $(inc) $(args) $<
 makeSparse.o: makeSparse.cpp defs.h makeSparse.h 
 	g++ -c $(inc) $(args) $<
-ALS.o: ALS.cpp ALS.h defs.h submatrix.h creation.h sor.h
-	g++ -c $(inc) $(arg) $<
+ALS.o: ALS.cpp ALS.h defs.h submatrix.h creation.h sor.h column.h
+	g++ -c $(inc) $(args) $<
 
 # Clean results of main targets
 .PHONY: clean

@@ -1,7 +1,11 @@
 #include "ALS.h"
 
+const double w = 1.1;
+const double convergence = 0.01;
+
 // Returns A^t*A 
-Matrix<double> selfProduct(const Matrix<double>& A) {
+template <class S>
+Matrix<double> selfProduct(const S& A) {
 	Matrix<double> product(A.numCols(), A.numCols(), 0);
 	for (size_t i = 0; i < A.numCols(); i++) {
 		for (size_t j = 0; j <= i; j++) {
@@ -14,10 +18,10 @@ Matrix<double> selfProduct(const Matrix<double>& A) {
 	return product;
 }
 
-template <class S>
-Matrix<double> transProduct(const Matrix<double>& A, const S<double>& B) {
+template <class R, class S>
+Matrix<double> transProduct(const R& A, const S& B) {
 	if (A.numRows() != B.numRows()) {
-		Matrix::size_mismatch error;
+		Matrix<double>::size_mismatch error;
 		throw error;
 	}
 	Matrix<double> product(A.numCols(), B.numCols(), 0);
@@ -31,19 +35,23 @@ Matrix<double> transProduct(const Matrix<double>& A, const S<double>& B) {
 	return product;
 }
 
-void diagonalAdd(Matrix<double& M, double lambda) {
+void diagonalAdd(Matrix<double>& M, double lambda) {
 	for (size_t i = 0; i < std::min(M.numRows(),M.numCols()); i++) {
 		M(i,i) += lambda;
 	}
 }
 
-Matrix<double> ALS(Matrix<double> M, int features, double lambda, int maxIter) {
+Matrix<double> ALS(Matrix<double>& M, int features, double lambda, int maxIter) {
 	size_t m, n;
 	m = M.numRows();
 	n = M.numCols();
 	int numIter = 0;
 	Matrix<double> U = randMat(m, features);
-	Matrix<double> V(n, features, 0);
+	Matrix<double> V = randMat(features, n);
+	std::vector<size_t> fullFeatureCol(features);
+	for (size_t i = 0; i < features; i++) {
+		fullFeatureCol[i] = i;
+	}
 
 	std::vector<std::vector<size_t> > selectors;
 	selectors.reserve(n+m);
@@ -74,9 +82,6 @@ Matrix<double> ALS(Matrix<double> M, int features, double lambda, int maxIter) {
 	// Perhaps modify the objects so as to efficiently undergo mitosis
 
 	while (numIter < maxIter) {
-		Matrix<double> newU(U.numRows(), U.numCols(), 0);
-		Matrix<double> newV(V.numRows(), V.numCols(), 0);
-
 		for (size_t i = 0; i < n; i++) {
 			if (selectors[i].size() > 0) {
 				Submatrix<double> A(U, selectors[i]);
@@ -84,26 +89,28 @@ Matrix<double> ALS(Matrix<double> M, int features, double lambda, int maxIter) {
 				Matrix<double> left = selfProduct(A);
 				diagonalAdd(left,lambda);
 				Matrix<double> right = transProduct(A,B);
-
-
+				Column<double> X(V, fullFeatureCol, i);
+				SOR(A, B, X, w, convergence);
 			}
 		}
-
+		U.shallowTranspose();
+		V.shallowTranspose();
 		for (size_t j = 0; j < m; j++ ) {
 			if (selectors[n+j].size() > 0) {
-
-
+				Submatrix<double> A(V, selectors[n+j]);
+				Column<double> B(M, selectors[n+j], j);
+				Matrix<double> left = selfProduct(A);
+				diagonalAdd(left,lambda);
+				Matrix<double> right = transProduct(A,B);
+				Column<double> X(U, fullFeatureCol, j);
+				SOR(A,B,X,w,convergence);
 			}
 		}
-
-
-
-
-
-
-
-
+		U.shallowTranspose();
+		V.shallowTranspose();
+		
 		numIter++;
 	}
-
+	
+	return U*V;
 }

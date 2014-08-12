@@ -1,3 +1,6 @@
+#ifndef CREATION_H
+#define CREATION_H
+
 #include "defs.h"
 #include "submatrix.h"
 
@@ -22,4 +25,4 @@ Matrix<double> randMat(size_t rows, size_t cols) {
 	return mat;
 }
 
-
+#endif
